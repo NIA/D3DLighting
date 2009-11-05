@@ -6,7 +6,7 @@ namespace
     const char      *SHADER_FILE = "shader.vsh";
     const int        WINDOW_SIZE = 600;
     const D3DCOLOR   BACKGROUND_COLOR = D3DCOLOR_XRGB( 64, 64, 74 );
-    const bool       INITIAL_WIREFRAME_STATE = true;
+    const bool       INITIAL_WIREFRAME_STATE = false;
 
     const unsigned   D3DXVEC_SIZE = sizeof(D3DXVECTOR4);
     const unsigned   VECTORS_IN_MATRIX = sizeof(D3DXMATRIX)/sizeof(D3DXVECTOR4);
@@ -84,8 +84,14 @@ void Application::render()
     check_render( device->SetVertexShader(shader) );
     // Setting constants
     float time = static_cast<float>( clock() )/static_cast<float>( CLOCKS_PER_SEC );
-    //   c0-c3 is the view matrix
+    //    c0-c3 is the view matrix
     check_render( device->SetVertexShaderConstantF(0, camera.get_matrix(), VECTORS_IN_MATRIX) );
+    //    c12 is directional light vector
+    check_render( device->SetVertexShaderConstantF(12, D3DXVECTOR4(-1.0f,0,0,0), 1) );
+    //    c13 is directional light color 
+    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(1.0f, 1.0f, 0.5f, 0), 1) );
+    //    c14 is diffuse coefficient     
+    check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(1.0f,0,0,0), 1) );
     // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )

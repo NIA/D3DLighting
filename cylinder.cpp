@@ -23,15 +23,20 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     const float STEP_ANGLE = 2*D3DX_PI/CYLINDER_EDGES_PER_BASE;
     const float STEP_UP = height/CYLINDER_EDGES_PER_HEIGHT;
     
+    D3DCOLOR color = D3DCOLOR_XRGB( rand_col_comp(), rand_col_comp(), rand_col_comp() );
     for( Index level = 0; level <= CYLINDER_EDGES_PER_HEIGHT; ++level )
     {
         for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
         {
             res_vertices[vertex] = Vertex( base_center
-                                         + D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
-                                                        radius*sin(step*STEP_ANGLE),
-                                                        level*STEP_UP),
-                                            static_cast<float>(level)/static_cast<float>(CYLINDER_EDGES_PER_HEIGHT)
+                                           + D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
+                                                          radius*sin(step*STEP_ANGLE),
+                                                          level*STEP_UP),
+                                           color, 
+                                           static_cast<float>(level)/static_cast<float>(CYLINDER_EDGES_PER_HEIGHT),
+                                           D3DXVECTOR3( cos(step*STEP_ANGLE),
+                                                        sin(step*STEP_ANGLE),
+                                                        0)
                                           );
             if( level != 0 )
             {
@@ -47,7 +52,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
         }
     }
     // Cap
-    res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), 1.0f );
+    res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), 1.0f, D3DXVECTOR3( 0, 0, 1.0f) );
     for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
     {
         res_indices[index++] = vertex - CYLINDER_EDGES_PER_BASE + step;

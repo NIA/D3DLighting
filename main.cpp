@@ -6,8 +6,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
 {
     srand( static_cast<unsigned>( time(NULL) ) );
 
-    Vertex * cylinder_vertices;
-    Index * cylinder_indices;
+    Vertex * cylinder_vertices = NULL;
+    Index * cylinder_indices = NULL;
     try
     {
         Application app;
