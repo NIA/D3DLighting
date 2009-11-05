@@ -3,7 +3,7 @@
 
 namespace
 {
-    const float SKINNING_PERIOD = 2.0e18f;
+    const float SKINNING_PERIOD = 3.0f;
     const float SKINNING_OMEGA = 2.0f*D3DX_PI/SKINNING_PERIOD;
 }
 

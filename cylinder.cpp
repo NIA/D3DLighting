@@ -1,6 +1,6 @@
 #include "cylinder.h"
 
-const Index CYLINDER_EDGES_PER_BASE = 40;
+const Index CYLINDER_EDGES_PER_BASE = 140;
 const Index CYLINDER_EDGES_PER_HEIGHT = 14;
 
 extern const Index CYLINDER_VERTICES_COUNT 
@@ -25,14 +25,15 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     
     for( Index level = 0; level <= CYLINDER_EDGES_PER_HEIGHT; ++level )
     {
+        D3DCOLOR color = random_color();
         for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
         {
-            D3DCOLOR color = D3DCOLOR_XRGB( rand_col_comp(), rand_col_comp(), rand_col_comp() );
+            //if( level == 
             res_vertices[vertex] = Vertex( base_center
                                            + D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
                                                           radius*sin(step*STEP_ANGLE),
                                                           level*STEP_UP),
-                                           color, 
+                                           color,
                                            static_cast<float>(level)/static_cast<float>(CYLINDER_EDGES_PER_HEIGHT),
                                            D3DXVECTOR3( cos(step*STEP_ANGLE),
                                                         sin(step*STEP_ANGLE),

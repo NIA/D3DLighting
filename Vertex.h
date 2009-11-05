@@ -13,6 +13,11 @@ inline int rand_col_comp()
     return rand()*255/RAND_MAX;
 }
 
+inline D3DCOLOR random_color()
+{
+    return D3DCOLOR_XRGB( rand_col_comp(), rand_col_comp(), rand_col_comp() );
+}
+
 class Vertex
 {
 public:
@@ -37,7 +42,7 @@ public:
     }
     Vertex(D3DXVECTOR3 pos, float weight, D3DXVECTOR3 normal) : pos(pos), normal(normal)
     {
-        color = D3DCOLOR_XRGB( rand_col_comp(), rand_col_comp(), rand_col_comp() );
+        color = random_color();
         set_weight(weight);
     }
 };
