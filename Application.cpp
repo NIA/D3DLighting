@@ -87,13 +87,15 @@ void Application::render()
     //    c0-c3 is the view matrix
     check_render( device->SetVertexShaderConstantF(0, camera.get_matrix(), VECTORS_IN_MATRIX) );
     //    c12 is directional light vector
-    D3DXVECTOR4 directional_vector(-1.0f,0,-0.5f,0);
+    D3DXVECTOR4 directional_vector(1.0f,0,0.5f,0);
     D3DXVec4Normalize(&directional_vector, &directional_vector);
     check_render( device->SetVertexShaderConstantF(12, directional_vector, 1) );
-    //    c13 is directional light color 
-    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(1.0f, 1.0f, 0.5f, 0), 1) );
-    //    c14 is diffuse coefficient     
+    //    c13 is directional light color
+    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(1.0f, 1.0f, 0.2f, 0), 1) );
+    //    c14 is diffuse coefficient
     check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(1.0f,0,0,0), 1) );
+    //    c15 is ambient color
+    check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
     // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
