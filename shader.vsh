@@ -14,19 +14,21 @@ dcl_normal v3
 ;; c15 is ambient light color       ;;
 ;; c16 is point light color         ;;
 ;; c17 is point light position      ;;
+;; c18 are attenuation constants    ;;
 ;;                                  ;;
 ;; c100 is constant 0.0f            ;;
 ;;                                  ;;
 ;; r0  is vertex after 1st bone     ;;
-;; r1  is vertex after 2nd bone     ;;
-;; r2  is transformed vertex        ;;
+; !r1  is vertex after 2nd bone     ;;
 ;; r3  is diffuse coefficient       ;;
 ;; r4  is light intensity           ;;
 ;; r5  is cos(theta)                ;;
 ;; r6  is result color              ;;
 ;; r7  is (color > 0)?              ;;
 ;; r9  is vertex after 1st bone     ;;
-;; r10 is vertex after 2nd bone     ;;
+; !r10 is vertex after 2nd bone     ;;
+;; r11 is distance vector           ;;
+;; r2  is distance                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 def c100, 0.0, 0.0, 0.0, 0.0
@@ -46,16 +48,32 @@ mad r10.xyz, r10.xyz, v2.y, r9.xyz
 ;;;;;;;;;;;;;;;;;;;;; Directional ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
 mov r3, c14             ; r3 = coef(diffuse)
-dp4 r5, c12, r10        ; r5 = cos(theta)
+dp3 r5, c12, r10        ; r5 = cos(theta)
 mul r4, c13, r3.x       ; r4 = I(direct)*coef(diffuse)
 mul r4, r4, r5.x        ; r4 *= cos(theta)
 
-sge r7.xyz, r4.xyz, c100.xyz    ; if some color comp. < 0
-mul r4.xyz, r4.xyz, r7.xyz      ; => make it == 0
+sge r7, r4, c100    ; if some color comp. < 0
+mul r6, r4, r7      ; => make it == 0
+
+;;;;;;;;;;;;;;;;;;;;;;;; Point ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
+add r11, c17, -r1       ; r11 = position(point) - position(vertex)
+dp3 r2, r11, r11        ; r2 = distance**2
+rsq r7, r2              ; r7 = distance
+mul r11, r11, r7.x      ; normalize r11
+dp3 r5, r11, r10        ; r5 = cos(theta)
+mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)
+mul r4, r4, r5.x        ; r4 *= cos(theta)
+rcp r2.x, r2.x
+;mul r4, r4, r2.x
+
+sge r7, r4, c100    ; if some color comp. < 0
+mul r4, r4, r7      ; => make it == 0
+add r6, r6, r4
 
 ;;;;;;;;;;;;;;;;;;;;;;; Ambient ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-add r4, r4, c15         ; r4 += I(ambient)
+add r6, r6, c15         ; r6 += I(ambient)
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Results ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 m4x4 oPos, r1, c0
-mul oD0, v1, r4
+mul oD0, v1, r6

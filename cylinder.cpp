@@ -25,10 +25,12 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     
     for( Index level = 0; level <= CYLINDER_EDGES_PER_HEIGHT; ++level )
     {
-        D3DCOLOR color = random_color();
+        D3DCOLOR color = D3DCOLOR_XRGB(200,200,200);//= random_color();
         for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
         {
-            //if( level == 
+            if( level == CYLINDER_EDGES_PER_HEIGHT )
+                color = random_color();
+            
             res_vertices[vertex] = Vertex( base_center
                                            + D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
                                                           radius*sin(step*STEP_ANGLE),

@@ -97,9 +97,11 @@ void Application::render()
     //    c15 is ambient color
     check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
     //    c16 is point light color
-    check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.1f, 0.4f, 0), 1) );
     //    c17 is point light position
-    check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.1f, -0.8f, 1.1f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.8f, -1.0f, 1.0f), 1) );
+    //    c18 are attenuation constants
+    check_render( device->SetVertexShaderConstantF(18, D3DXVECTOR4(0, 0, 0.5f, 0), 1) );
     // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
