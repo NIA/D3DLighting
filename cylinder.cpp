@@ -4,7 +4,7 @@ const Index CYLINDER_EDGES_PER_BASE = 40;
 const Index CYLINDER_EDGES_PER_HEIGHT = 14;
 
 extern const Index CYLINDER_VERTICES_COUNT 
-    = CYLINDER_EDGES_PER_BASE*(CYLINDER_EDGES_PER_HEIGHT + 1) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels
+    = CYLINDER_EDGES_PER_BASE*(CYLINDER_EDGES_PER_HEIGHT + 2) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last level again
     + 1; // plus the center of the cap
 extern const DWORD CYLINDER_INDICES_COUNT
     = 2*(CYLINDER_EDGES_PER_BASE + 1)*CYLINDER_EDGES_PER_HEIGHT // indices per CYLINDER_EDGES_PER_HEIGHT levels
@@ -23,11 +23,11 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     const float STEP_ANGLE = 2*D3DX_PI/CYLINDER_EDGES_PER_BASE;
     const float STEP_UP = height/CYLINDER_EDGES_PER_HEIGHT;
     
-    D3DCOLOR color = D3DCOLOR_XRGB( rand_col_comp(), rand_col_comp(), rand_col_comp() );
     for( Index level = 0; level <= CYLINDER_EDGES_PER_HEIGHT; ++level )
     {
         for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
         {
+            D3DCOLOR color = D3DCOLOR_XRGB( rand_col_comp(), rand_col_comp(), rand_col_comp() );
             res_vertices[vertex] = Vertex( base_center
                                            + D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
                                                           radius*sin(step*STEP_ANGLE),
@@ -52,7 +52,14 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
         }
     }
     // Cap
-    res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), 1.0f, D3DXVECTOR3( 0, 0, 1.0f) );
+    D3DXVECTOR3 normal_up( 0, 0, 1.0f );
+    for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
+    {
+        res_vertices[vertex] = res_vertices[vertex - CYLINDER_EDGES_PER_BASE];
+        res_vertices[vertex].normal = normal_up;
+        ++vertex;
+    }
+    res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), 1.0f, normal_up );
     for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
     {
         res_indices[index++] = vertex - CYLINDER_EDGES_PER_BASE + step;
