@@ -3,7 +3,7 @@
 
 namespace
 {
-    const float SKINNING_PERIOD = 3.0f;
+    const float SKINNING_PERIOD = 12.0f;
     const float SKINNING_OMEGA = 2.0f*D3DX_PI/SKINNING_PERIOD;
 }
 
@@ -64,7 +64,7 @@ void Model::draw() const
 void Model::set_bones(float time)
 {
     // first bone will set the rotation
-    float angle = D3DX_PI/4.0f*sin(SKINNING_OMEGA*time);
+    float angle = D3DX_PI/2.0f*sin(SKINNING_OMEGA*time);
     bones[0] = rotate_x_matrix( angle, rotate_center );
     // others will still be a unity matrix
 }

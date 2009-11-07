@@ -14,7 +14,7 @@ namespace
 
 Application::Application() :
     d3d(NULL), device(NULL), vertex_decl(NULL), shader(NULL),
-    window(WINDOW_SIZE, WINDOW_SIZE), camera(2.7f, 1.5f, 0.0f) // Constants selected for better view of cylinder
+    window(WINDOW_SIZE, WINDOW_SIZE), camera(2.9f, 1.5f, 0.0f) // Constants selected for better view of cylinder
 {
     try
     {
@@ -87,7 +87,7 @@ void Application::render()
     //    c0-c3 is the view matrix
     check_render( device->SetVertexShaderConstantF(0, camera.get_matrix(), VECTORS_IN_MATRIX) );
     //    c12 is directional light vector
-    D3DXVECTOR4 directional_vector(0, 1.0f, 0.5f, 0);
+    D3DXVECTOR4 directional_vector(0, 1.0f, 0.8f, 0);
     D3DXVec4Normalize(&directional_vector, &directional_vector);
     check_render( device->SetVertexShaderConstantF(12, directional_vector, 1) );
     //    c13 is directional light color
@@ -97,11 +97,11 @@ void Application::render()
     //    c15 is ambient color
     check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
     //    c16 is point light color
-    check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.1f, 0.4f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.9f, 0.9f, 0), 1) );
     //    c17 is point light position
-    check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.8f, -1.0f, 1.0f), 1) );
+    check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.82f, -1.0f, 1.0f), 1) );
     //    c18 are attenuation constants
-    check_render( device->SetVertexShaderConstantF(18, D3DXVECTOR4(0, 0, 0.5f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(18, D3DXVECTOR4(0.4f, 0, 1.3f, 0), 1) );
     // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )

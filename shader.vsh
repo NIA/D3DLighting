@@ -59,13 +59,15 @@ mul r6, r4, r7      ; => make it == 0
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
 add r11, c17, -r1       ; r11 = position(point) - position(vertex)
 dp3 r2, r11, r11        ; r2 = distance**2
-rsq r7, r2              ; r7 = distance
+rsq r7, r2              ; r7 = 1/distance
 mul r11, r11, r7.x      ; normalize r11
 dp3 r5, r11, r10        ; r5 = cos(theta)
 mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)
 mul r4, r4, r5.x        ; r4 *= cos(theta)
-rcp r2.x, r2.x
-;mul r4, r4, r2.x
+dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
+dp3 r7.x, r2, c18       ; r7.x = (a + b*d + c*d**2 + e/d)
+rcp r7.x, r7.x          ; r7.x = attenuation coef
+mul r4, r4, r7.x
 
 sge r7, r4, c100    ; if some color comp. < 0
 mul r4, r4, r7      ; => make it == 0
