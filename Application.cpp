@@ -97,7 +97,7 @@ void Application::render()
     //    c15 is ambient color
     check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
     //    c16 is point light color
-    check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.9f, 0.9f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.6f, 0.6f, 0), 1) );
     //    c17 is point light position
     check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.82f, -1.0f, 1.0f), 1) );
     //    c18 are attenuation constants

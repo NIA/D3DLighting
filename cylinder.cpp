@@ -59,7 +59,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
     {
         res_vertices[vertex] = res_vertices[vertex - CYLINDER_EDGES_PER_BASE];
-        res_vertices[vertex].normal = normal_up;
+        res_vertices[vertex].set_normal( normal_up );
         ++vertex;
     }
     res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), 1.0f, normal_up );

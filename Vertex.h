@@ -22,28 +22,33 @@ class Vertex
 {
 public:
     D3DXVECTOR3 pos;            // The position for the vertex
-    D3DXVECTOR3 normal;         // The outer normal of model
+    D3DXVECTOR4 normal;         // The outer normal of model
     D3DCOLOR color;             // The vertex color
     float weights[BONES_COUNT]; // Weights for skinning
-private:
     void set_weight(float weight)
     {
         weights[0] = weight;
         weights[1] = 1 - weight;
     }
-public:
-    Vertex() : pos(), color(0), normal(1,0,0)
+    void set_normal(D3DXVECTOR3 tri_normal)
+    {
+        normal = D3DXVECTOR4(tri_normal, 0);
+    }
+    Vertex() : pos(), color(0)
     {
         set_weight(1.0f);
+        set_normal(D3DXVECTOR3(1.0f, 0, 0));
     }
-    Vertex(D3DXVECTOR3 pos, D3DCOLOR color, float weight, D3DXVECTOR3 normal) : pos(pos), color(color), normal(normal)
+    Vertex(D3DXVECTOR3 pos, D3DCOLOR color, float weight, D3DXVECTOR3 normal) : pos(pos), color(color)
     {
         set_weight(weight);
+        set_normal(normal);
     }
-    Vertex(D3DXVECTOR3 pos, float weight, D3DXVECTOR3 normal) : pos(pos), normal(normal)
+    Vertex(D3DXVECTOR3 pos, float weight, D3DXVECTOR3 normal) : pos(pos)
     {
         color = random_color();
         set_weight(weight);
+        set_normal(normal);
     }
 };
 

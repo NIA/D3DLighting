@@ -44,6 +44,9 @@ m4x4 r9, v3, c4
 mul r9.xyz, r9.xyz, v2.x
 m4x4 r10, v3, c8
 mad r10.xyz, r10.xyz, v2.y, r9.xyz
+dp3 r2, r10, r10        ; r2 = |normal|**2
+rsq r7, r2              ; r7 = 1/|normal|
+mul r10.xyz, r10.xyz, r7.x      ; normalize r10
 
 ;;;;;;;;;;;;;;;;;;;;; Directional ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
@@ -60,7 +63,7 @@ mul r6, r4, r7      ; => make it == 0
 add r11, c17, -r1       ; r11 = position(point) - position(vertex)
 dp3 r2, r11, r11        ; r2 = distance**2
 rsq r7, r2              ; r7 = 1/distance
-mul r11, r11, r7.x      ; normalize r11
+mul r11.xyz, r11.xyz, r7.x      ; normalize r11
 dp3 r5, r11, r10        ; r5 = cos(theta)
 mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)
 mul r4, r4, r5.x        ; r4 *= cos(theta)
