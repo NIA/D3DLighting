@@ -30,6 +30,7 @@ dcl_normal v3
 ; !r6  is result color              ;;
 ;; r7  is temp                      ;;
 ;; r8  is cos(phi) (specular)       ;;
+; !r9  is normalized eye (v)        ;;
 ;; r9  is normal after 1st bone     ;;
 ; !r10 is normal after 2nd bone     ;;
 ;; r11 is distance vector           ;;
@@ -52,6 +53,11 @@ dp3 r2, r10, r10        ; r2 = |normal|**2
 rsq r7, r2              ; r7 = 1/|normal|
 mul r10, r10, r7.x      ; normalize r10
 
+; calculating normalized v
+add r9, c21, -r1       ; r9 = position(eye) - position(vertex)
+dp3 r0, r9, r9         ; r0 = distance**2
+rsq r7, r0             ; r7 = 1/distance
+mul r9, r9, r7.x       ; normalize r9
 ;;;;;;;;;;;;;;;;;;;;; Directional ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dp3 r5, c12, r10        ; r5 = cos(theta)
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
@@ -66,13 +72,8 @@ mov r3, c19             ; r3 = coef(specular)
 mul r2, r10, r5.x   ; r2 = (l, n)*n
 add r2, r2, r2      ; r2 = 2*(l, n)*n
 add r2, r2, -c12    ; r2 = 2*(l, n)*n - l
-; calculating normalized v
-add r11, c21, -r1       ; r11 = position(eye) - position(vertex)
-dp3 r0, r11, r11        ; r0 = distance**2
-rsq r7, r0              ; r7 = 1/distance
-mul r11, r11, r7.x      ; normalize r11
 ; calculating cos(phi)**f
-dp3 r8, r2, r11         ; r8 = cos(phi)
+dp3 r8, r2, r9          ; r8 = cos(phi)
 max r8, r8, c100        ; if cos < 0, let it = 0
 mov r7.y, r8.x
 mov r7.w, c20.x
@@ -107,11 +108,6 @@ mov r3, c19             ; r3 = coef(specular)
 mul r2, r10, r5.x   ; r2 = (l, n)*n
 add r2, r2, r2      ; r2 = 2*(l, n)*n
 add r2, r2, -r11    ; r2 = 2*(l, n)*n - l
-; calculating normalized v
-add r9, c21, -r1       ; r9 = position(eye) - position(vertex)
-dp3 r0, r9, r9         ; r0 = distance**2
-rsq r7, r0             ; r7 = 1/distance
-mul r9, r9, r7.x       ; normalize r9
 ; calculating cos(phi)**f
 dp3 r8, r2, r9          ; r8 = cos(phi)
 max r8, r8, c100        ; if cos < 0, let it = 0
