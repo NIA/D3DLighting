@@ -43,4 +43,5 @@ public:
     void update_matrices();
 
     D3DXMATRIX get_matrix() const;
+    D3DXVECTOR3 get_eye() const;
 };

@@ -128,7 +128,7 @@ static D3DXVECTOR3 spheric_to_cartesian( D3DXVECTOR3 spheric )
 
 void Camera::update_matrices()
 {
-    D3DXVECTOR3 eye = spheric_to_cartesian( eye_spheric );
+    D3DXVECTOR3 eye = get_eye();
     D3DXVECTOR3 axis_x, axis_y, axis_z;
     axis_z = at - eye;
     D3DXVec3Cross( &axis_x, &up, &axis_z );
@@ -152,4 +152,9 @@ void Camera::update_matrices()
 D3DXMATRIX Camera::get_matrix() const
 {
     return mx;
+}
+
+D3DXVECTOR3 Camera::get_eye() const
+{
+    return spheric_to_cartesian( eye_spheric );
 }

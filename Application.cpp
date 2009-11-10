@@ -93,7 +93,7 @@ void Application::render()
     //    c13 is directional light color
     check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(0.8f, 0.8f, 0.2f, 0), 1) );
     //    c14 is diffuse coefficient
-    check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(1.0f, 0,0,0), 1) );
+    check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(0.5f, 0,0,0), 1) );
     //    c15 is ambient color
     check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
     //    c16 is point light color
@@ -102,6 +102,12 @@ void Application::render()
     check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.82f, -1.0f, 1.0f), 1) );
     //    c18 are attenuation constants
     check_render( device->SetVertexShaderConstantF(18, D3DXVECTOR4(0.4f, 0, 1.3f, 0), 1) );
+    //     c19 is specular coefficient
+    check_render( device->SetVertexShaderConstantF(19, D3DXVECTOR4(0.5f, 0,0,0), 1) );
+    //     c20 is specular constant 'f'
+    check_render( device->SetVertexShaderConstantF(20, D3DXVECTOR4(6.0f, 0,0,0), 1) );
+    //     c21 is eye position
+    check_render( device->SetVertexShaderConstantF(21, D3DXVECTOR4(camera.get_eye(), 0), 1) );
     // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
