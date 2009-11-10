@@ -105,7 +105,7 @@ void Application::render()
     //     c19 is specular coefficient
     check_render( device->SetVertexShaderConstantF(19, D3DXVECTOR4(0.6f, 0,0,0), 1) );
     //     c20 is specular constant 'f'
-    check_render( device->SetVertexShaderConstantF(20, D3DXVECTOR4(20.0f, 0,0,0), 1) );
+    check_render( device->SetVertexShaderConstantF(20, D3DXVECTOR4(15.0f, 0,0,0), 1) );
     //     c21 is eye position
     check_render( device->SetVertexShaderConstantF(21, D3DXVECTOR4(camera.get_eye(), 0), 1) );
     // Draw

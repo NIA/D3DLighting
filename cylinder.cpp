@@ -1,13 +1,14 @@
 #include "cylinder.h"
 
-const Index CYLINDER_EDGES_PER_BASE = 140;
-const Index CYLINDER_EDGES_PER_HEIGHT = 64;
+const Index CYLINDER_EDGES_PER_BASE = 120;
+const Index CYLINDER_EDGES_PER_HEIGHT = 84;
+const Index CYLINDER_EDGES_PER_CAP = 24;
 
 extern const Index CYLINDER_VERTICES_COUNT 
-    = CYLINDER_EDGES_PER_BASE*(CYLINDER_EDGES_PER_HEIGHT + 2) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last level again
+    = (CYLINDER_EDGES_PER_BASE)*(CYLINDER_EDGES_PER_HEIGHT + CYLINDER_EDGES_PER_CAP + 1) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last level again, plus CYLINDER_EDGES_PER_CAP-1 levels per cap
     + 1; // plus the center of the cap
 extern const DWORD CYLINDER_INDICES_COUNT
-    = 2*(CYLINDER_EDGES_PER_BASE + 1)*CYLINDER_EDGES_PER_HEIGHT // indices per CYLINDER_EDGES_PER_HEIGHT levels
+    = 2*(CYLINDER_EDGES_PER_BASE + 1)*(CYLINDER_EDGES_PER_HEIGHT + CYLINDER_EDGES_PER_CAP - 1) // indices per CYLINDER_EDGES_PER_HEIGHT levels plus CYLINDER_EDGES_PER_CAP-1 levels per cap
     + (2*CYLINDER_EDGES_PER_BASE + 1); // plus cap
 
 void cylinder( D3DXVECTOR3 base_center, float radius, float height,
@@ -59,6 +60,32 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
         res_vertices[vertex] = res_vertices[vertex - CYLINDER_EDGES_PER_BASE];
         res_vertices[vertex].set_normal( normal_up );
         ++vertex;
+    }
+    for( Index level = 1; level < CYLINDER_EDGES_PER_CAP; ++level )
+    {
+        for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
+        {
+            float local_radius =  radius*static_cast<float>(CYLINDER_EDGES_PER_CAP-level)/static_cast<float>(CYLINDER_EDGES_PER_CAP);
+            res_vertices[vertex] = Vertex( base_center
+                                           + D3DXVECTOR3( local_radius*cos(step*STEP_ANGLE),
+                                                          local_radius*sin(step*STEP_ANGLE),
+                                                          height),
+                                           color,
+                                           1.0f,
+                                           normal_up
+                                          );
+            if( level != 0 )
+            {
+                res_indices[index++] = vertex - CYLINDER_EDGES_PER_BASE; // from previous level
+                res_indices[index++] = vertex;                           // from current level
+                if( step == CYLINDER_EDGES_PER_BASE - 1 ) // last step
+                {
+                    res_indices[index++] = vertex - 2*CYLINDER_EDGES_PER_BASE + 1; // first from previuos level
+                    res_indices[index++] = vertex - CYLINDER_EDGES_PER_BASE + 1; // first from current level
+                }
+            }
+            ++vertex;
+        }
     }
     res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), color, 1.0f, normal_up );
     for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
