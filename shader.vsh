@@ -79,7 +79,7 @@ mov r7.w, c20.x
 lit r8, r7              ; r8.z = cos(phi)**f
 
 mul r4, c13, r3.x       ; r4 = I(direct)*coef(specular)
-mul r4, r4, r8.z        ; r4 *= cos(theta)
+mul r4, r4, r8.z        ; r4 *= cos(phi)**f
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
@@ -98,6 +98,29 @@ dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
 dp4 r7.x, r2, c18       ; r7.x = (a + b*d + c*d**2 + e/d)
 rcp r7.x, r7.x          ; r7.x = attenuation coef
 mul r4, r4, r7.x
+
+max r4, r4, c100        ; if some color comp. < 0 => make it == 0
+add r6, r6, r4
+; - - - - - - - - - - - specular - - - - - - - - - - - - - -;
+mov r3, c19             ; r3 = coef(specular)
+; calculating r:
+mul r2, r10, r5.x   ; r2 = (l, n)*n
+add r2, r2, r2      ; r2 = 2*(l, n)*n
+add r2, r2, -r11    ; r2 = 2*(l, n)*n - l
+; calculating normalized v
+add r9, c21, -r1       ; r9 = position(eye) - position(vertex)
+dp3 r0, r9, r9         ; r0 = distance**2
+rsq r7, r0             ; r7 = 1/distance
+mul r9, r9, r7.x       ; normalize r9
+; calculating cos(phi)**f
+dp3 r8, r2, r9          ; r8 = cos(phi)
+max r8, r8, c100        ; if cos < 0, let it = 0
+mov r7.y, r8.x
+mov r7.w, c20.x
+lit r8, r7              ; r8.z = cos(phi)**f
+
+mul r4, c16, r3.x       ; r4 = I(point)*coef(specular)
+mul r4, r4, r8.z        ; r4 *= cos(phi)**f
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
