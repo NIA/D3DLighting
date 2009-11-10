@@ -64,7 +64,7 @@ void Model::draw() const
 void Model::set_bones(float time)
 {
     // first bone will set the rotation
-    float angle = D3DX_PI/3.0f*sin(SKINNING_OMEGA*time);
+    float angle = D3DX_PI/2.0f*sin(SKINNING_OMEGA*time);
     bones[0] = rotate_x_matrix( angle, rotate_center );
     // others will still be a unity matrix
 }

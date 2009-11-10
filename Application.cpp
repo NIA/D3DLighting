@@ -91,19 +91,19 @@ void Application::render()
     D3DXVec4Normalize(&directional_vector, &directional_vector);
     check_render( device->SetVertexShaderConstantF(12, directional_vector, 1) );
     //    c13 is directional light color
-    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(0.8f, 0.8f, 0.2f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(0.9f, 0.8f, 0.1f, 0), 1) );
     //    c14 is diffuse coefficient
-    check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(0.5f, 0,0,0), 1) );
+    check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(0.6f, 0,0,0), 1) );
     //    c15 is ambient color
     check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
     //    c16 is point light color
     check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.6f, 0.6f, 0), 1) );
     //    c17 is point light position
-    check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.82f, -1.0f, 1.0f), 1) );
+    check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.91f, -1.0f, 1.0f), 1) );
     //    c18 are attenuation constants
-    check_render( device->SetVertexShaderConstantF(18, D3DXVECTOR4(0.4f, 0, 1.3f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(18, D3DXVECTOR4(1.0f, 0, 1.2f, 0), 1) );
     //     c19 is specular coefficient
-    check_render( device->SetVertexShaderConstantF(19, D3DXVECTOR4(0.6f, 0,0,0), 1) );
+    check_render( device->SetVertexShaderConstantF(19, D3DXVECTOR4(0.3f, 0,0,0), 1) );
     //     c20 is specular constant 'f'
     check_render( device->SetVertexShaderConstantF(20, D3DXVECTOR4(15.0f, 0,0,0), 1) );
     //     c21 is eye position

@@ -22,8 +22,9 @@ dcl_normal v3
 ;; c100 is constant 0.0f            ;;
 ;;                                  ;;
 ;; r0  is vertex after 1st bone     ;;
+; ?r0  is attenuation               ;;
 ; !r1  is vertex after 2nd bone     ;;
-; ?r2  is r (for specular)          ;;
+;; r2  is r (for specular)          ;;
 ; ?r3  is diff/spec coefficient     ;;
 ;; r4  is light intensity           ;;
 ; !r5  is cos(theta)                ;;
@@ -33,7 +34,7 @@ dcl_normal v3
 ; !r9  is normalized eye (v)        ;;
 ;; r9  is normal after 1st bone     ;;
 ; !r10 is normal after 2nd bone     ;;
-;; r11 is distance vector           ;;
+;; r11 is direction vector          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 def c100, 0.0, 0.0, 0.0, 0.0
@@ -86,19 +87,22 @@ max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Point ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; calculating normalized direction vector
 add r11, c17, -r1       ; r11 = position(point) - position(vertex)
 dp3 r2, r11, r11        ; r2 = distance**2
 rsq r7, r2              ; r7 = 1/distance
 mul r11, r11, r7.x      ; normalize r11
+; calculating cos(theta)
 dp3 r5, r11, r10        ; r5 = cos(theta)
+; calculating attenuation
+dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
+dp4 r0.x, r2, c18       ; r0.x = (a + b*d + c*d**2 + e/d)
+rcp r0, r0.xxxx         ; r0 = attenuation coef
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
 mov r3, c14             ; r3 = coef(diffuse)
 mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)
 mul r4, r4, r5.x        ; r4 *= cos(theta)
-dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
-dp4 r7.x, r2, c18       ; r7.x = (a + b*d + c*d**2 + e/d)
-rcp r7.x, r7.x          ; r7.x = attenuation coef
-mul r4, r4, r7.x
+mul r4, r4, r0.x        ; r4 *= attenuation
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
@@ -117,6 +121,7 @@ lit r8, r7              ; r8.z = cos(phi)**f
 
 mul r4, c16, r3.x       ; r4 = I(point)*coef(specular)
 mul r4, r4, r8.z        ; r4 *= cos(phi)**f
+mul r4, r4, r0.x        ; r4 *= attenuation
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
