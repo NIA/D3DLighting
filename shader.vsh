@@ -52,34 +52,16 @@ dp3 r2, r10, r10        ; r2 = |normal|**2
 rsq r7, r2              ; r7 = 1/|normal|
 mul r10, r10, r7.x      ; normalize r10
 
-mov r3, c14             ; r3 = coef(diffuse)
-; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
 ;;;;;;;;;;;;;;;;;;;;; Directional ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dp3 r5, c12, r10        ; r5 = cos(theta)
+; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
+mov r3, c14             ; r3 = coef(diffuse)
 mul r4, c13, r3.x       ; r4 = I(direct)*coef(diffuse)
 mul r4, r4, r5.x        ; r4 *= cos(theta)
 
 max r6, r4, c100        ; if some color comp. < 0 => make it == 0
-;;;;;;;;;;;;;;;;;;;;;;;; Point ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-add r11, c17, -r1       ; r11 = position(point) - position(vertex)
-dp3 r2, r11, r11        ; r2 = distance**2
-rsq r7, r2              ; r7 = 1/distance
-mul r11, r11, r7.x      ; normalize r11
-dp3 r5, r11, r10        ; r5 = cos(theta)
-mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)
-mul r4, r4, r5.x        ; r4 *= cos(theta)
-dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
-dp4 r7.x, r2, c18       ; r7.x = (a + b*d + c*d**2 + e/d)
-rcp r7.x, r7.x          ; r7.x = attenuation coef
-mul r4, r4, r7.x
-
-max r4, r4, c100        ; if some color comp. < 0 => make it == 0
-add r6, r6, r4
-
-mov r3, c19             ; r3 = coef(diffuse)
 ; - - - - - - - - - - - specular - - - - - - - - - - - - - -;
-;;;;;;;;;;;;;;;;;;;;; Directional ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-dp3 r5, c12, r10        ; r5 = cos(theta)
+mov r3, c19             ; r3 = coef(specular)
 ; calculating r:
 mul r2, r10, r5.x   ; r2 = (l, n)*n
 add r2, r2, r2      ; r2 = 2*(l, n)*n
@@ -98,6 +80,24 @@ lit r8, r7              ; r8.z = cos(phi)**f
 
 mul r4, c13, r3.x       ; r4 = I(direct)*coef(specular)
 mul r4, r4, r8.z        ; r4 *= cos(theta)
+
+max r4, r4, c100        ; if some color comp. < 0 => make it == 0
+add r6, r6, r4
+
+;;;;;;;;;;;;;;;;;;;;;;;; Point ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+add r11, c17, -r1       ; r11 = position(point) - position(vertex)
+dp3 r2, r11, r11        ; r2 = distance**2
+rsq r7, r2              ; r7 = 1/distance
+mul r11, r11, r7.x      ; normalize r11
+dp3 r5, r11, r10        ; r5 = cos(theta)
+; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
+mov r3, c14             ; r3 = coef(diffuse)
+mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)
+mul r4, r4, r5.x        ; r4 *= cos(theta)
+dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
+dp4 r7.x, r2, c18       ; r7.x = (a + b*d + c*d**2 + e/d)
+rcp r7.x, r7.x          ; r7.x = attenuation coef
+mul r4, r4, r7.x
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
