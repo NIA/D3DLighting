@@ -24,8 +24,16 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     const float STEP_ANGLE = 2*D3DX_PI/CYLINDER_EDGES_PER_BASE;
     const float STEP_UP = height/CYLINDER_EDGES_PER_HEIGHT;
     
-    D3DCOLOR color;
-    color = D3DCOLOR_XRGB(200, 200, 200);//random_color();
+    D3DCOLOR colors[] =
+    {
+        D3DCOLOR_XRGB(0, 150, 250),
+        D3DCOLOR_XRGB(250, 30, 10),
+        D3DCOLOR_XRGB(250, 250, 0),
+        D3DCOLOR_XRGB(30, 250, 0),
+        D3DCOLOR_XRGB(250, 250, 250),
+    };
+    const unsigned colors_num = array_size(colors);
+    Index quater = (CYLINDER_EDGES_PER_HEIGHT+colors_num+1)/colors_num;
     for( Index level = 0; level <= CYLINDER_EDGES_PER_HEIGHT; ++level )
     {
         for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
@@ -34,7 +42,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
                                            + D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
                                                           radius*sin(step*STEP_ANGLE),
                                                           level*STEP_UP),
-                                           color,
+                                           colors[level/quater],
                                            static_cast<float>(level)/static_cast<float>(CYLINDER_EDGES_PER_HEIGHT),
                                            D3DXVECTOR3( cos(step*STEP_ANGLE),
                                                         sin(step*STEP_ANGLE),
@@ -55,10 +63,12 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     }
     // Cap
     D3DXVECTOR3 normal_up( 0, 0, 1.0f );
+    quater = (CYLINDER_EDGES_PER_BASE + colors_num)/colors_num;
     for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
     {
         res_vertices[vertex] = res_vertices[vertex - CYLINDER_EDGES_PER_BASE];
         res_vertices[vertex].set_normal( normal_up );
+        res_vertices[vertex].color = colors[step/quater];
         ++vertex;
     }
     for( Index level = 1; level < CYLINDER_EDGES_PER_CAP; ++level )
@@ -70,7 +80,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
                                            + D3DXVECTOR3( local_radius*cos(step*STEP_ANGLE),
                                                           local_radius*sin(step*STEP_ANGLE),
                                                           height),
-                                           color,
+                                           colors[step/quater],
                                            1.0f,
                                            normal_up
                                           );
@@ -87,7 +97,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
             ++vertex;
         }
     }
-    res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), color, 1.0f, normal_up );
+    res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3( 0, 0, height), colors[0], 1.0f, normal_up );
     for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
     {
         res_indices[index++] = vertex - CYLINDER_EDGES_PER_BASE + step;

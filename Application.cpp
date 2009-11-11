@@ -91,11 +91,11 @@ void Application::render()
     D3DXVec4Normalize(&directional_vector, &directional_vector);
     check_render( device->SetVertexShaderConstantF(12, directional_vector, 1) );
     //    c13 is directional light color
-    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(0.9f, 0.8f, 0.1f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(0.8f, 0.7f, 0.1f, 0), 1) );
     //    c14 is diffuse coefficient
     check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(0.6f, 0,0,0), 1) );
     //    c15 is ambient color
-    check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.1f, 0.1f, 0.1f, 0), 1) );
+    check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.05f, 0.13f, 0.05f, 0), 1) );
     //    c16 is point light color
     check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.6f, 0.6f, 0), 1) );
     //    c17 is point light position

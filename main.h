@@ -24,3 +24,8 @@ template<class Type> void delete_array(Type **dynamic_array)
         *dynamic_array = NULL;
     }
 }
+template<size_t size, class T> inline size_t array_size(T (&array)[size])
+{
+    UNREFERENCED_PARAMETER(array);
+    return size;
+}
