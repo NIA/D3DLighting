@@ -21,6 +21,7 @@ Application::Application() :
         init_device();
         init_shader();
     }
+    // using catch(...) because every caught exception is rethrown
     catch(...)
     {
         release_interfaces();

@@ -32,7 +32,7 @@ public:
     }
     void set_normal(D3DXVECTOR3 tri_normal)
     {
-        normal = D3DXVECTOR4(tri_normal, 0);
+        normal = D3DXVECTOR4(tri_normal, 0); // normal is a vector, not a point!
     }
     Vertex() : pos(), color(0)
     {

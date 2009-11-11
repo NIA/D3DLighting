@@ -47,6 +47,7 @@ Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const
         for(unsigned i = 0; i < BONES_COUNT; ++i)
             bones[i] = rotate_x_matrix(0.0f);
     }
+    // using catch(...) because every caught exception is rethrown
     catch(...)
     {
         release_interfaces();
