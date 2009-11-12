@@ -5,11 +5,11 @@ const Index CYLINDER_EDGES_PER_HEIGHT = 84;
 const Index CYLINDER_EDGES_PER_CAP = 24;
 
 const Index CYLINDER_VERTICES_COUNT 
-    = (CYLINDER_EDGES_PER_BASE)*(CYLINDER_EDGES_PER_HEIGHT + CYLINDER_EDGES_PER_CAP + 1) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last level again, plus CYLINDER_EDGES_PER_CAP-1 levels per cap
-    + 1; // plus the center of the cap
+    = (CYLINDER_EDGES_PER_BASE)*((CYLINDER_EDGES_PER_HEIGHT + 1) + 2 + 2*(CYLINDER_EDGES_PER_CAP -1)) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last ans first levels again, plus CYLINDER_EDGES_PER_CAP-1 levels per each of 2 caps
+    + 2; // plus centers of 2 caps
 const DWORD CYLINDER_INDICES_COUNT
-    = 2*(CYLINDER_EDGES_PER_BASE + 1)*(CYLINDER_EDGES_PER_HEIGHT + CYLINDER_EDGES_PER_CAP - 1) // indices per CYLINDER_EDGES_PER_HEIGHT levels plus CYLINDER_EDGES_PER_CAP-1 levels per cap
-    + (2*CYLINDER_EDGES_PER_BASE + 1); // plus cap
+    = 2*(CYLINDER_EDGES_PER_BASE + 1)*(CYLINDER_EDGES_PER_HEIGHT + 2*(CYLINDER_EDGES_PER_CAP - 1)) // indices per CYLINDER_EDGES_PER_HEIGHT levels plus CYLINDER_EDGES_PER_CAP-1 levels per each of 2 caps
+    + 2*(2*CYLINDER_EDGES_PER_BASE + 1); // plus 2 ends of caps
 
 namespace
 {
@@ -150,18 +150,11 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     generate_levels(vertex, index, params);
 
     // Cap
-    D3DXVECTOR3 normal_up( 0, 0, 1.0f );
-    //for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
-    //{
-    //    res_vertices[vertex] = res_vertices[vertex - CYLINDER_EDGES_PER_BASE];
-    //    res_vertices[vertex].set_normal( normal_up );
-    //    res_vertices[vertex].color = colors[step/part_size];
-    //    ++vertex;
-    //}
-
     params.radial_strips = true;
     params.vertical = false;
     params.top = true;
+    generate_levels(vertex, index, params);
 
+    params.top = false;
     generate_levels(vertex, index, params);
 }

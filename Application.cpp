@@ -5,7 +5,7 @@ namespace
 {
     const char      *SHADER_FILE = "shader.vsh";
     const int        WINDOW_SIZE = 600;
-    const D3DCOLOR   BACKGROUND_COLOR = D3DCOLOR_XRGB( 64, 64, 74 );
+    const D3DCOLOR   BACKGROUND_COLOR = D3DCOLOR_XRGB( 5, 5, 10 );
     const bool       INITIAL_WIREFRAME_STATE = false;
 
     const unsigned   D3DXVEC_SIZE = sizeof(D3DXVECTOR4);
@@ -100,7 +100,7 @@ void Application::render()
     //    c16 is point light color
     set_shader_color(16, D3DCOLOR_XRGB(25, 153, 153));
     //    c17 is point light position
-    set_shader_point(17, D3DXVECTOR3(0.2f, -0.91f, -1.0f));
+    set_shader_point(17, D3DXVECTOR3(0.2f, -0.91f, -1.1f));
     //    c18 are attenuation constants
     set_shader_vector(18, D3DXVECTOR3(1.0f, 0, 1.2f));
     //     c19 is specular coefficient
