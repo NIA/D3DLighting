@@ -1,8 +1,8 @@
 #include "cylinder.h"
 
-const Index CYLINDER_EDGES_PER_BASE = 120;
-const Index CYLINDER_EDGES_PER_HEIGHT = 80;
-const Index CYLINDER_EDGES_PER_CAP = 20;
+const Index CYLINDER_EDGES_PER_BASE = 400;
+const Index CYLINDER_EDGES_PER_HEIGHT = 300;
+const Index CYLINDER_EDGES_PER_CAP = 350;
 
 const Index CYLINDER_VERTICES_COUNT 
     = (CYLINDER_EDGES_PER_BASE)*((CYLINDER_EDGES_PER_HEIGHT + 1) + 2 + 2*(CYLINDER_EDGES_PER_CAP -1)) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last ans first levels again, plus CYLINDER_EDGES_PER_CAP-1 levels per each of 2 caps
@@ -126,11 +126,11 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
 
     D3DCOLOR colors[] =
     {
-        D3DCOLOR_XRGB(0, 150, 250),
+        D3DCOLOR_XRGB(250, 250, 250),
         D3DCOLOR_XRGB(250, 30, 10),
         D3DCOLOR_XRGB(250, 250, 0),
         D3DCOLOR_XRGB(30, 250, 0),
-        D3DCOLOR_XRGB(250, 250, 250),
+        D3DCOLOR_XRGB(0, 150, 250),
     };
     const unsigned colors_num = array_size(colors);
 

@@ -18,6 +18,11 @@ dcl_normal v3
 ;; c19 is specular coefficient      ;;
 ;; c20 is specular constant 'f'     ;;
 ;; c21 is eye position              ;;
+;; c22 is spot light position       ;;
+;; c23 is spot light color          ;;
+;; c24 is spot light direction      ;;
+;; c25 is cos(spotlight_inner_angle);;
+;; c26 is cos(spotlight_outer_angle);;
 ;;                                  ;;
 ;; c100 is constant 0.0f            ;;
 ;;                                  ;;
@@ -121,6 +126,31 @@ lit r8, r7              ; r8.z = cos(phi)**f
 
 mul r4, c16, r3.x       ; r4 = I(point)*coef(specular)
 mul r4, r4, r8.z        ; r4 *= cos(phi)**f
+mul r4, r4, r0.x        ; r4 *= attenuation
+
+max r4, r4, c100        ; if some color comp. < 0 => make it == 0
+add r6, r6, r4
+
+;;;;;;;;;;;;;;;;;;;;;;;; Spot ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; calculating normalized direction vector
+add r11, c22, -r1       ; r11 = position(spot_light) - position(vertex)
+dp3 r2, r11, r11        ; r2 = distance**2
+rsq r7, r2              ; r7 = 1/distance
+mul r11, r11, r7.x      ; normalize r11
+; calculating cos(theta)
+dp3 r5, r11, r10        ; r5 = cos(theta)
+; calculating attenuation
+dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
+dp3 r0, r2, c18         ; r0 = (a + b*d + c*d**2)
+rcp r0, r0              ; r0 = attenuation coef
+; calculating bounds
+dp3 r3, r11, c24        ; r3 = cos( l, d ), where l is vector vertex-light, d is spot light direction
+sge r2, r3.x, c25.x     ; r2 = if angle r3 < inner angle
+mul r0, r0, r2.x        ; attenuation *= r2
+; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
+mov r3, c14             ; r3 = coef(diffuse)
+mul r4, c23, r3.x       ; r4 = I(point)*coef(diffuse)
+mul r4, r4, r5.x        ; r4 *= cos(theta)
 mul r4, r4, r0.x        ; r4 *= attenuation
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0

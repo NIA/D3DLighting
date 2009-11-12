@@ -102,13 +102,25 @@ void Application::render()
     //    c17 is point light position
     set_shader_point(17, D3DXVECTOR3(0.2f, -0.91f, -1.1f));
     //    c18 are attenuation constants
-    set_shader_vector(18, D3DXVECTOR3(1.0f, 0, 1.2f));
+    set_shader_vector(18, D3DXVECTOR3(1.0f, 0, 0.8f));
     //     c19 is specular coefficient
     set_shader_float(19, 0.3f);
     //     c20 is specular constant 'f'
     set_shader_float(20, 15.0f);
     //     c21 is eye position
     set_shader_point(21, camera.get_eye());
+    //     c22 is spot light position
+    set_shader_point(22, D3DXVECTOR3(1.3f, 0.5f, -1.2f));
+    //     c23 is spot light color
+    set_shader_color(23, D3DCOLOR_XRGB(217, 255, 0));
+    //     c24 is spot light direction
+    D3DXVECTOR3 spot_vector(3.0f, 2.0f, -1.1f);
+    D3DXVec3Normalize(&spot_vector, &spot_vector);
+    set_shader_vector(24, spot_vector);
+    //     c25 is cos( spot light inner angle )
+    set_shader_float(25, cos(D3DX_PI/16));
+    //     c26 is cos( spot light outer angle )
+    set_shader_float(26, cos(D3DX_PI/12));
     // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
