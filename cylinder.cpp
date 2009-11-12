@@ -1,15 +1,17 @@
 #include "cylinder.h"
 
 const Index CYLINDER_EDGES_PER_BASE = 120;
-const Index CYLINDER_EDGES_PER_HEIGHT = 84;
-const Index CYLINDER_EDGES_PER_CAP = 24;
+const Index CYLINDER_EDGES_PER_HEIGHT = 80;
+const Index CYLINDER_EDGES_PER_CAP = 20;
 
 const Index CYLINDER_VERTICES_COUNT 
     = (CYLINDER_EDGES_PER_BASE)*((CYLINDER_EDGES_PER_HEIGHT + 1) + 2 + 2*(CYLINDER_EDGES_PER_CAP -1)) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last ans first levels again, plus CYLINDER_EDGES_PER_CAP-1 levels per each of 2 caps
-    + 2; // plus centers of 2 caps
+    + 2 // plus centers of 2 caps
+    + CYLINDER_EDGES_PER_HEIGHT; // plus jump between top and bottom
 const DWORD CYLINDER_INDICES_COUNT
     = 2*(CYLINDER_EDGES_PER_BASE + 1)*(CYLINDER_EDGES_PER_HEIGHT + 2*(CYLINDER_EDGES_PER_CAP - 1)) // indices per CYLINDER_EDGES_PER_HEIGHT levels plus CYLINDER_EDGES_PER_CAP-1 levels per each of 2 caps
-    + 2*(2*CYLINDER_EDGES_PER_BASE + 1); // plus 2 ends of caps
+    + 2*(2*CYLINDER_EDGES_PER_BASE + 1) // plus 2 ends of caps
+    + CYLINDER_EDGES_PER_HEIGHT + 2;  // plus jump between top and bottom
 
 namespace
 {
@@ -154,6 +156,22 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     params.vertical = false;
     params.top = true;
     generate_levels(vertex, index, params);
+
+    // Go from last level to first inside cylinder
+    const float STEP_UP = params.height/CYLINDER_EDGES_PER_HEIGHT;
+    for( unsigned level = CYLINDER_EDGES_PER_HEIGHT; level != 0; --level )
+    {
+        res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3(0, 0, level*STEP_UP),
+                                       static_cast<float>(level)/CYLINDER_EDGES_PER_HEIGHT,
+                                       D3DXVECTOR3(0,0,1.0f) );
+        res_indices[index++] = vertex;
+        ++vertex;
+    }
+    for( unsigned i = 0; i < VERTICES_PER_TRIANGLE-1; ++i )
+    {
+        // making degenerate triangle
+        res_indices[index++] = vertex;
+    }
 
     params.top = false;
     generate_levels(vertex, index, params);
