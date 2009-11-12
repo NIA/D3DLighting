@@ -4,10 +4,10 @@ const Index CYLINDER_EDGES_PER_BASE = 120;
 const Index CYLINDER_EDGES_PER_HEIGHT = 84;
 const Index CYLINDER_EDGES_PER_CAP = 24;
 
-extern const Index CYLINDER_VERTICES_COUNT 
+const Index CYLINDER_VERTICES_COUNT 
     = (CYLINDER_EDGES_PER_BASE)*(CYLINDER_EDGES_PER_HEIGHT + CYLINDER_EDGES_PER_CAP + 1) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last level again, plus CYLINDER_EDGES_PER_CAP-1 levels per cap
     + 1; // plus the center of the cap
-extern const DWORD CYLINDER_INDICES_COUNT
+const DWORD CYLINDER_INDICES_COUNT
     = 2*(CYLINDER_EDGES_PER_BASE + 1)*(CYLINDER_EDGES_PER_HEIGHT + CYLINDER_EDGES_PER_CAP - 1) // indices per CYLINDER_EDGES_PER_HEIGHT levels plus CYLINDER_EDGES_PER_CAP-1 levels per cap
     + (2*CYLINDER_EDGES_PER_BASE + 1); // plus cap
 
@@ -18,12 +18,13 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     Index vertex = 0; // current vertex
     DWORD index = 0; // current index
 
+    const float STEP_ANGLE = 2*D3DX_PI/CYLINDER_EDGES_PER_BASE;
+    const float STEP_UP = height/CYLINDER_EDGES_PER_HEIGHT;
+    const float STEP_RADIAL = radius/CYLINDER_EDGES_PER_CAP;
+    
     _ASSERT(res_vertices != NULL);
     _ASSERT(res_indices != NULL);
 
-    const float STEP_ANGLE = 2*D3DX_PI/CYLINDER_EDGES_PER_BASE;
-    const float STEP_UP = height/CYLINDER_EDGES_PER_HEIGHT;
-    
     D3DCOLOR colors[] =
     {
         D3DCOLOR_XRGB(0, 150, 250),
@@ -43,7 +44,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
                                                           radius*sin(step*STEP_ANGLE),
                                                           level*STEP_UP),
                                            colors[level/part_size],
-                                           static_cast<float>(level)/static_cast<float>(CYLINDER_EDGES_PER_HEIGHT),
+                                           static_cast<float>(level)/CYLINDER_EDGES_PER_HEIGHT,
                                            D3DXVECTOR3( cos(step*STEP_ANGLE),
                                                         sin(step*STEP_ANGLE),
                                                         0)
@@ -75,7 +76,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     {
         for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
         {
-            float local_radius =  radius*static_cast<float>(CYLINDER_EDGES_PER_CAP-level)/static_cast<float>(CYLINDER_EDGES_PER_CAP);
+            float local_radius =  radius - STEP_RADIAL*level;
             res_vertices[vertex] = Vertex( base_center
                                            + D3DXVECTOR3( local_radius*cos(step*STEP_ANGLE),
                                                           local_radius*sin(step*STEP_ANGLE),

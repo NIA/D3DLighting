@@ -4,6 +4,7 @@
 
 extern const Index CYLINDER_EDGES_PER_BASE;
 extern const Index CYLINDER_EDGES_PER_HEIGHT;
+extern const Index CYLINDER_EDGES_PER_CAP;
 
 extern const Index CYLINDER_VERTICES_COUNT;
 extern const DWORD CYLINDER_INDICES_COUNT; // Calculated for TRIANGLESTRIP primitive type
