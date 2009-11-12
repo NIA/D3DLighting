@@ -96,8 +96,8 @@ mul r11, r11, r7.x      ; normalize r11
 dp3 r5, r11, r10        ; r5 = cos(theta)
 ; calculating attenuation
 dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
-dp4 r0.x, r2, c18       ; r0.x = (a + b*d + c*d**2 + e/d)
-rcp r0, r0.xxxx         ; r0 = attenuation coef
+dp3 r0, r2, c18         ; r0 = (a + b*d + c*d**2)
+rcp r0, r0              ; r0 = attenuation coef
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
 mov r3, c14             ; r3 = coef(diffuse)
 mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)

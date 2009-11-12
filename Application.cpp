@@ -9,8 +9,8 @@ namespace
     const bool       INITIAL_WIREFRAME_STATE = false;
 
     const unsigned   D3DXVEC_SIZE = sizeof(D3DXVECTOR4);
-    const unsigned   VECTORS_IN_MATRIX = sizeof(D3DXMATRIX)/sizeof(D3DXVECTOR4);
 }
+const unsigned VECTORS_IN_MATRIX = sizeof(D3DXMATRIX)/sizeof(D3DXVECTOR4);
 
 Application::Application() :
     d3d(NULL), device(NULL), vertex_decl(NULL), shader(NULL),
@@ -86,29 +86,29 @@ void Application::render()
     // Setting constants
     float time = static_cast<float>( clock() )/static_cast<float>( CLOCKS_PER_SEC );
     //    c0-c3 is the view matrix
-    check_render( device->SetVertexShaderConstantF(0, camera.get_matrix(), VECTORS_IN_MATRIX) );
+    set_shader_matrix(0, camera.get_matrix());
     //    c12 is directional light vector
-    D3DXVECTOR4 directional_vector(0, 1.0f, 0.8f, 0);
-    D3DXVec4Normalize(&directional_vector, &directional_vector);
-    check_render( device->SetVertexShaderConstantF(12, directional_vector, 1) );
+    D3DXVECTOR3 directional_vector(0, 1.0f, 0.8f);
+    D3DXVec3Normalize(&directional_vector, &directional_vector);
+    set_shader_vector(12, directional_vector);
     //    c13 is directional light color
-    check_render( device->SetVertexShaderConstantF(13, D3DXCOLOR(0.8f, 0.7f, 0.1f, 0), 1) );
+    set_shader_color(13, D3DCOLOR_XRGB(204, 178, 25));
     //    c14 is diffuse coefficient
-    check_render( device->SetVertexShaderConstantF(14, D3DXVECTOR4(0.6f, 0,0,0), 1) );
+    set_shader_float(14, 0.6f);
     //    c15 is ambient color
-    check_render( device->SetVertexShaderConstantF(15, D3DXCOLOR(0.05f, 0.13f, 0.05f, 0), 1) );
+    set_shader_color(15, D3DCOLOR_XRGB(13, 33, 13));
     //    c16 is point light color
-    check_render( device->SetVertexShaderConstantF(16, D3DXCOLOR(0.1f, 0.6f, 0.6f, 0), 1) );
+    set_shader_color(16, D3DCOLOR_XRGB(25, 153, 153));
     //    c17 is point light position
-    check_render( device->SetVertexShaderConstantF(17, D3DXVECTOR4(0.2f, -0.91f, -1.0f, 1.0f), 1) );
+    set_shader_point(17, D3DXVECTOR3(0.2f, -0.91f, -1.0f));
     //    c18 are attenuation constants
-    check_render( device->SetVertexShaderConstantF(18, D3DXVECTOR4(1.0f, 0, 1.2f, 0), 1) );
+    set_shader_vector(18, D3DXVECTOR3(1.0f, 0, 1.2f));
     //     c19 is specular coefficient
-    check_render( device->SetVertexShaderConstantF(19, D3DXVECTOR4(0.3f, 0,0,0), 1) );
+    set_shader_float(19, 0.3f);
     //     c20 is specular constant 'f'
-    check_render( device->SetVertexShaderConstantF(20, D3DXVECTOR4(15.0f, 0,0,0), 1) );
+    set_shader_float(20, 15.0f);
     //     c21 is eye position
-    check_render( device->SetVertexShaderConstantF(21, D3DXVECTOR4(camera.get_eye(), 0), 1) );
+    set_shader_point(21, camera.get_eye());
     // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
@@ -119,7 +119,7 @@ void Application::render()
         (*iter)->set_bones(time); // re-initialize bones
         for(unsigned i = 0; i < BONES_COUNT; ++i)
         {
-            check_render( device->SetVertexShaderConstantF( offset, (*iter)->get_bone(i), VECTORS_IN_MATRIX) );
+            set_shader_matrix(offset, (*iter)->get_bone(i));
             offset += VECTORS_IN_MATRIX;
         }
         (*iter)->draw();
