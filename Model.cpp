@@ -8,13 +8,13 @@ namespace
     const float SKINNING_ANGLE = D3DX_PI/8.0f;
 }
 
-Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, unsigned vertex_size,
+Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, VertexShader &shader, unsigned vertex_size,
                 const Vertex *vertices, unsigned vertices_count, const Index *indices, unsigned indices_count,
                 unsigned primitives_count, D3DXVECTOR3 position, D3DXVECTOR3 rotation )
  
 : device(device), vertices_count(vertices_count), primitives_count(primitives_count),
   primitive_type(primitive_type), vertex_buffer(NULL), index_buffer(NULL),
-  position(position), rotation(rotation), vertex_size(vertex_size)
+  position(position), rotation(rotation), vertex_size(vertex_size), shader(shader)
 {
     _ASSERT(vertices != NULL);
     _ASSERT(indices != NULL);
@@ -54,6 +54,11 @@ Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, unsig
     }
 }
 
+VertexShader &Model::get_shader()
+{
+    return shader;
+}
+
 void Model::draw() const
 {
     check_render( device->SetStreamSource( 0, vertex_buffer, 0, vertex_size ) );
@@ -84,10 +89,10 @@ Model::~Model()
 
 // -------------------------------------- SkinningModel -------------------------------------------------------------
 
-SkinningModel::SkinningModel(IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const SkinningVertex *vertices,
-                             unsigned int vertices_count, const Index *indices, unsigned int indices_count,
+SkinningModel::SkinningModel(IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, VertexShader &shader,
+                             const SkinningVertex *vertices, unsigned int vertices_count, const Index *indices, unsigned int indices_count,
                              unsigned int primitives_count, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 bone_center)
-: Model(device, primitive_type, sizeof(SkinningVertex), vertices, vertices_count, indices, indices_count, primitives_count, position, rotation),
+: Model(device, primitive_type, shader, sizeof(SkinningVertex), vertices, vertices_count, indices, indices_count, primitives_count, position, rotation),
   bone_center(bone_center)
 {
     _ASSERT( BONES_COUNT <= sizeof(D3DXVECTOR4) ); // to fit weights into vertex shader register

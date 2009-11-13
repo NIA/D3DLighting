@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Shader.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\shader.vsh"
 				>
 			</File>
@@ -241,6 +245,10 @@
 			</File>
 			<File
 				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Shader.h"
 				>
 			</File>
 			<File

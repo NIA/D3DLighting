@@ -1,11 +1,13 @@
 #pragma once
 #include "main.h"
 #include "Vertex.h"
+#include "Shader.h"
 
 class Model
 {
 private:
-    IDirect3DDevice9        *device;
+    IDirect3DDevice9    *device;
+    VertexShader        &shader;
 
     unsigned    vertices_count;
     unsigned    primitives_count;
@@ -26,6 +28,7 @@ private:
 public:
     Model(  IDirect3DDevice9 *device,
             D3DPRIMITIVETYPE primitive_type,
+            VertexShader &shader,
             unsigned vertex_size,
             const Vertex *vertices,
             unsigned vertices_count,
@@ -35,11 +38,16 @@ public:
             D3DXVECTOR3 position,
             D3DXVECTOR3 rotation);
     
+    VertexShader &get_shader();
     virtual void set_time(float time) { UNREFERENCED_PARAMETER(time); }
     const D3DXMATRIX &get_rotation_and_position() const;
     virtual void draw() const;
 
     virtual ~Model();
+private:
+    // No copying!
+    Model(const Model&);
+    Model &operator=(const Model&);
 };
 
 class SkinningModel : public Model
@@ -50,6 +58,7 @@ private:
 public:
     SkinningModel(  IDirect3DDevice9 *device,
                     D3DPRIMITIVETYPE primitive_type,
+                    VertexShader &shader,
                     const SkinningVertex *vertices,
                     unsigned vertices_count,
                     const Index *indices,

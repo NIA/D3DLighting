@@ -17,8 +17,6 @@ class Application
 private:
     IDirect3D9                  *d3d;           // used to create the D3DDevice
     IDirect3DDevice9            *device;        // our rendering device
-    IDirect3DVertexDeclaration9 *vertex_decl;   // vertex declaration
-    IDirect3DVertexShader9      *shader;        // vertex shader
 
     Window window;
 
@@ -28,7 +26,6 @@ private:
 
     // Initialization steps:
     void init_device();
-    void init_shader();
 
     // Wrappers for SetVertexShaderConstantF:
     void set_shader_const(unsigned reg, const float *data, unsigned vector4_count)

@@ -1,16 +1,21 @@
 #include "main.h"
 #include "Application.h"
+#include "Model.h"
 #include "cylinder.h"
 
-const D3DCOLOR colors[] =
+namespace
 {
-    D3DCOLOR_XRGB(250, 250, 250),
-    D3DCOLOR_XRGB(250, 30, 10),
-    D3DCOLOR_XRGB(250, 250, 0),
-    D3DCOLOR_XRGB(30, 250, 0),
-    D3DCOLOR_XRGB(0, 150, 250),
-};
-const unsigned colors_count = array_size(colors);
+    const char *SKINNING_SHADER_FILENAME = "shader.vsh";
+    const D3DCOLOR colors[] =
+    {
+        D3DCOLOR_XRGB(250, 250, 250),
+        D3DCOLOR_XRGB(250, 30, 10),
+        D3DCOLOR_XRGB(250, 250, 0),
+        D3DCOLOR_XRGB(30, 250, 0),
+        D3DCOLOR_XRGB(0, 150, 250),
+    };
+    const unsigned colors_count = array_size(colors);
+}
 
 INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
 {
@@ -21,6 +26,8 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
     try
     {
         Application app;
+
+        VertexShader skinning_shader(app.get_device(), SKINNING_VERTEX_DECL_ARRAY, SKINNING_SHADER_FILENAME);
         
         cylinder_vertices = new SkinningVertex[CYLINDER_VERTICES_COUNT];
         cylinder_indices = new Index[CYLINDER_INDICES_COUNT];
@@ -33,6 +40,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
 
         SkinningModel cylinder1(app.get_device(),
                                 D3DPT_TRIANGLESTRIP,
+                                skinning_shader,
                                 cylinder_vertices,
                                 CYLINDER_VERTICES_COUNT,
                                 cylinder_indices,
@@ -49,6 +57,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
 
         SkinningModel cylinder2(app.get_device(),
                                 D3DPT_TRIANGLESTRIP,
+                                skinning_shader,
                                 cylinder_vertices,
                                 CYLINDER_VERTICES_COUNT,
                                 cylinder_indices,

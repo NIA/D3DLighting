@@ -5,7 +5,6 @@ const unsigned VECTORS_IN_MATRIX = sizeof(D3DXMATRIX)/sizeof(D3DXVECTOR4);
 
 namespace
 {
-    const char       *SHADER_FILE = "shader.vsh";
     const int         WINDOW_SIZE = 600;
     const D3DCOLOR    BACKGROUND_COLOR = D3DCOLOR_XRGB( 5, 5, 10 );
     const bool        INITIAL_WIREFRAME_STATE = false;
@@ -67,13 +66,11 @@ namespace
 }
 
 Application::Application() :
-    d3d(NULL), device(NULL), vertex_decl(NULL), shader(NULL),
-    window(WINDOW_SIZE, WINDOW_SIZE), camera(2.9f, 1.5f, 0.0f) // Constants selected for better view of cylinder
+    d3d(NULL), device(NULL), window(WINDOW_SIZE, WINDOW_SIZE), camera(2.9f, 1.5f, 0.0f) // Constants selected for better view of cylinder
 {
     try
     {
         init_device();
-        init_shader();
     }
     // using catch(...) because every caught exception is rethrown
     catch(...)
@@ -106,37 +103,12 @@ void Application::init_device()
     toggle_wireframe();
 }
 
-void Application::init_shader()
-{
-    if( FAILED( device->CreateVertexDeclaration(SKINNING_VERTEX_DECL_ARRAY, &vertex_decl) ) )
-        throw VertexDeclarationInitError();
-
-    ID3DXBuffer * shader_buffer = NULL;
-    try
-    {
-        if( FAILED( D3DXAssembleShaderFromFileA( SHADER_FILE, NULL, NULL, NULL, &shader_buffer, NULL ) ) )
-            throw VertexShaderAssemblyError();
-        if( FAILED( device->CreateVertexShader( (DWORD*) shader_buffer->GetBufferPointer(), &shader ) ) )
-            throw VertexShaderInitError();
-    }
-    catch(...)
-    {
-        release_interface(shader_buffer);
-        throw;
-    }
-    release_interface(shader_buffer);
-    
-}
-
 void Application::render()
 {
     check_render( device->Clear( 0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, BACKGROUND_COLOR, 1.0f, 0 ) );
     
     // Begin the scene
     check_render( device->BeginScene() );
-    // Setup
-    check_render( device->SetVertexDeclaration(vertex_decl) );
-    check_render( device->SetVertexShader(shader) );
     // Setting constants
     float time = static_cast<float>( clock() )/static_cast<float>( CLOCKS_PER_SEC );
     D3DXVECTOR3 directional_vector;
@@ -160,10 +132,12 @@ void Application::render()
     set_shader_vector( SHADER_REG_SPOT_VECTOR,        spot_vector);
     set_shader_float(  SHADER_REG_SPOT_INNER_ANGLE,   cos(SHADER_VAL_SPOT_INNER_ANGLE));
     set_shader_float(  SHADER_REG_SPOT_OUTER_ANGLE,   cos(SHADER_VAL_SPOT_OUTER_ANGLE));
-    // Draw
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
     {
+        // Set up
+        ( (*iter)->get_shader() ).set();
+        // Setting constants
         (*iter)->set_time(time);
         SkinningModel *skinning_model = dynamic_cast<SkinningModel*>(*iter);
         if( skinning_model != NULL)
@@ -177,6 +151,7 @@ void Application::render()
             }
         }
         set_shader_matrix( SHADER_REG_POS_AND_ROT_MX, (*iter)->get_rotation_and_position() );
+        // Draw
         (*iter)->draw();
     }
     // End the scene
@@ -285,8 +260,6 @@ void Application::release_interfaces()
 {
     release_interface( d3d );
     release_interface( device );
-    release_interface( vertex_decl );
-    release_interface( shader );
 }
 
 Application::~Application()
