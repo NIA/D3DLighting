@@ -16,7 +16,19 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
         cylinder_indices = new Index[CYLINDER_INDICES_COUNT];
         
         const float height = 2.0f;
-        cylinder( D3DXVECTOR3(0,0,-height/2), 0.7f, height, cylinder_vertices, cylinder_indices );
+        D3DCOLOR colors[] =
+        {
+            D3DCOLOR_XRGB(250, 250, 250),
+            D3DCOLOR_XRGB(250, 30, 10),
+            D3DCOLOR_XRGB(250, 250, 0),
+            D3DCOLOR_XRGB(30, 250, 0),
+            D3DCOLOR_XRGB(0, 150, 250),
+        };
+        const unsigned colors_count = array_size(colors);
+
+        cylinder( D3DXVECTOR3(0,0,-height/2), 0.7f, height,
+                  colors, colors_count,
+                  cylinder_vertices, cylinder_indices );
 
         Model cylinder( app.get_device(),
                         D3DPT_TRIANGLESTRIP,

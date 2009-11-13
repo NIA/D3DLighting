@@ -25,8 +25,8 @@ namespace
         float radius;
         float height;
         // colors
-        D3DCOLOR *colors;
-        unsigned colors_num;
+        const D3DCOLOR *colors;
+        unsigned colors_count;
         // options
         bool radial_strips; // radial (depending on step) or vertical (depending on level) color distribution
         bool vertical;      // vertical (for cylinder side) or horisontal (for caps) moving whe generating
@@ -41,7 +41,7 @@ namespace
 
         Index levels_count = params.vertical ? CYLINDER_EDGES_PER_HEIGHT + 1 : CYLINDER_EDGES_PER_CAP;
         Index levels_or_steps_count = params.radial_strips ? CYLINDER_EDGES_PER_BASE : levels_count;
-        Index part_size = (levels_or_steps_count + params.colors_num)/params.colors_num; // `+ colors_num' just for excluding a bound of interval [0, colors_num)
+        Index part_size = (levels_or_steps_count + params.colors_count)/params.colors_count; // `+ colors_count' just for excluding a bound of interval [0, colors_count)
         
         D3DXVECTOR3 normal_if_horisontal = D3DXVECTOR3(0, 0, params.top ? 1.0f : -1.0f);
         float z_if_horisontal = params.top ? params.height : 0.0f;
@@ -115,7 +115,8 @@ namespace
 }
 
 void cylinder( D3DXVECTOR3 base_center, float radius, float height,
-                Vertex *res_vertices, Index *res_indices)
+               const D3DCOLOR *colors, unsigned colors_count,
+               Vertex *res_vertices, Index *res_indices)
 // Writes data into arrays given as `res_vertices' and `res_indices',
 {
     Index vertex = 0; // current vertex
@@ -123,16 +124,6 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     
     _ASSERT(res_vertices != NULL);
     _ASSERT(res_indices != NULL);
-
-    D3DCOLOR colors[] =
-    {
-        D3DCOLOR_XRGB(250, 250, 250),
-        D3DCOLOR_XRGB(250, 30, 10),
-        D3DCOLOR_XRGB(250, 250, 0),
-        D3DCOLOR_XRGB(30, 250, 0),
-        D3DCOLOR_XRGB(0, 150, 250),
-    };
-    const unsigned colors_num = array_size(colors);
 
     GENERATION_PARAMS params;
     // output buffers
@@ -144,7 +135,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     params.height = height;
     // colors
     params.colors = colors;
-    params.colors_num = colors_num;
+    params.colors_count = colors_count;
     // options
     params.radial_strips = false;
     params.vertical = true;

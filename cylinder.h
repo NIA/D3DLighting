@@ -11,4 +11,5 @@ extern const DWORD CYLINDER_INDICES_COUNT; // Calculated for TRIANGLESTRIP primi
 
 // Writes data into arrays given as `res_vertices' and `res_indices',
 void cylinder( D3DXVECTOR3 base_center, float radius, float height,
-                Vertex *res_vertices, Index *res_indices);
+               const D3DCOLOR *colors, unsigned colors_count,
+               Vertex *res_vertices, Index *res_indices);
