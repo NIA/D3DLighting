@@ -198,7 +198,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\shader.vsh"
+				RelativePath=".\tessellate.cpp"
 				>
 			</File>
 			<File
@@ -252,6 +252,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tessellate.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Vertex.h"
 				>
 			</File>
@@ -271,6 +275,14 @@
 			</File>
 			<File
 				RelativePath=".\Lighting.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\morphing.vsh"
+				>
+			</File>
+			<File
+				RelativePath=".\skinning.vsh"
 				>
 			</File>
 		</Filter>

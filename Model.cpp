@@ -6,6 +6,9 @@ namespace
     const float SKINNING_PERIOD = 2.0f;
     const float SKINNING_OMEGA = 2.0f*D3DX_PI/SKINNING_PERIOD;
     const float SKINNING_ANGLE = D3DX_PI/8.0f;
+
+    const float MORPHING_PERIOD = 1.0f;
+    const float MORPHING_OMEGA = 2.0f*D3DX_PI/MORPHING_PERIOD;
 }
 
 Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, VertexShader &shader, unsigned vertex_size,
@@ -112,4 +115,29 @@ void SkinningModel::set_time(float time)
     float angle = SKINNING_ANGLE*sin(SKINNING_OMEGA*time);
     bones[0] = rotate_x_matrix( angle, bone_center );
     // others will still be a unity matrix
+}
+
+// -------------------------------------- SkinningModel -------------------------------------------------------------
+
+MorphingModel::MorphingModel(IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, VertexShader &shader,
+                             const Vertex *vertices, unsigned int vertices_count, const Index *indices, unsigned int indices_count,
+                             unsigned int primitives_count, D3DXVECTOR3 position, D3DXVECTOR3 rotation, float final_radius)
+: Model(device, primitive_type, shader, sizeof(Vertex), vertices, vertices_count, indices, indices_count, primitives_count, position, rotation),
+  morphing_param(1), final_radius(final_radius)
+{
+}
+
+float MorphingModel::get_mophing_param() const
+{
+    return morphing_param;
+}
+
+float MorphingModel::get_final_radius() const
+{
+    return final_radius;
+}
+
+void MorphingModel::set_time(float time)
+{
+    morphing_param = (sin(MORPHING_OMEGA*time) + 1.0f)/2.0f; // parameter of morhing: 0 to 1
 }

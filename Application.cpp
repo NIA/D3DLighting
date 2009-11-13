@@ -64,6 +64,10 @@ namespace
     const unsigned    SHADER_REG_SPOT_CONST_COEF = 26;
     //    c27-c30 is position and rotation of model matrix
     const unsigned    SHADER_REG_POS_AND_ROT_MX = 27;
+    //    c31 is final radius for morphing
+    const unsigned    SHADER_REG_FINAL_RADIUS = 31;
+    //    c32 is morphing parameter
+    const unsigned    SHADER_REG_MORPHING_PARAM = 32;
 }
 
 Application::Application() :
@@ -143,11 +147,13 @@ void Application::render()
     set_shader_vector( SHADER_REG_SPOT_VECTOR,        spot_vector);
     set_shader_float(  SHADER_REG_SPOT_X_COEF,        1/(in_cos - out_cos));
     set_shader_float(  SHADER_REG_SPOT_CONST_COEF,    out_cos/(in_cos - out_cos));
+    
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
     {
         // Set up
         ( (*iter)->get_shader() ).set();
+
         // Setting constants
         (*iter)->set_time(time);
         SkinningModel *skinning_model = dynamic_cast<SkinningModel*>(*iter);
@@ -161,7 +167,18 @@ void Application::render()
                 offset += VECTORS_IN_MATRIX;
             }
         }
+        else
+        {
+            MorphingModel *morphing_model = dynamic_cast<MorphingModel*>(*iter);
+            if( morphing_model != NULL)
+            {
+                // if it is really a MorphingModel
+                set_shader_float(SHADER_REG_FINAL_RADIUS, morphing_model->get_final_radius());
+                set_shader_float(SHADER_REG_MORPHING_PARAM, morphing_model->get_mophing_param());
+            }
+        }
         set_shader_matrix( SHADER_REG_POS_AND_ROT_MX, (*iter)->get_rotation_and_position() );
+        
         // Draw
         (*iter)->draw();
     }

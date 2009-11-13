@@ -72,3 +72,27 @@ public:
     // Overrides:
     virtual void set_time(float time);
 };
+
+class MorphingModel : public Model
+{
+private:
+    float morphing_param;
+    float final_radius;
+public:
+    MorphingModel(  IDirect3DDevice9 *device,
+                    D3DPRIMITIVETYPE primitive_type,
+                    VertexShader &shader,
+                    const Vertex *vertices,
+                    unsigned vertices_count,
+                    const Index *indices,
+                    unsigned indices_count,
+                    unsigned primitives_count,
+                    D3DXVECTOR3 position,
+                    D3DXVECTOR3 rotation,
+                    float final_radius);
+
+    float get_mophing_param() const;
+    float get_final_radius() const;
+    // Overrides:
+    virtual void set_time(float time);
+};
