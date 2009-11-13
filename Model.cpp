@@ -8,19 +8,19 @@ namespace
     const float SKINNING_ANGLE = D3DX_PI/8.0f;
 }
 
-Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const Vertex *vertices,
-                unsigned vertices_count, const Index *indices, unsigned indices_count,
-                unsigned primitives_count, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 bone_center )
+Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, unsigned vertex_size,
+                const Vertex *vertices, unsigned vertices_count, const Index *indices, unsigned indices_count,
+                unsigned primitives_count, D3DXVECTOR3 position, D3DXVECTOR3 rotation )
  
 : device(device), vertices_count(vertices_count), primitives_count(primitives_count),
   primitive_type(primitive_type), vertex_buffer(NULL), index_buffer(NULL),
-  position(position), rotation(rotation), bone_center(bone_center)
+  position(position), rotation(rotation), vertex_size(vertex_size)
 {
     _ASSERT(vertices != NULL);
     _ASSERT(indices != NULL);
     try
     {
-        const unsigned vertices_size = vertices_count*sizeof(vertices[0]);
+        const unsigned vertices_size = vertices_count*vertex_size;
         const unsigned indices_size = indices_count*sizeof(indices[0]);
 
         if(FAILED( device->CreateVertexBuffer( vertices_size, D3DUSAGE_WRITEONLY, 0, D3DPOOL_DEFAULT, &vertex_buffer, NULL ) ))
@@ -29,7 +29,6 @@ Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const
 
         if(FAILED( device->CreateIndexBuffer( indices_size, D3DUSAGE_WRITEONLY, INDEX_FORMAT, D3DPOOL_DEFAULT, &index_buffer, NULL ) ))
             throw IndexBufferInitError();
-                    
 
         // fill the vertex buffer.
         VOID* vertices_to_fill;
@@ -44,11 +43,7 @@ Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const
             throw IndexBufferFillError();
         memcpy( indices_to_fill, indices, indices_size );
         index_buffer->Unlock();
-
-        _ASSERT( BONES_COUNT <= sizeof(D3DXVECTOR4) ); // to fit weights into vertex shader register
-        for(unsigned i = 0; i < BONES_COUNT; ++i)
-            bones[i] = rotate_x_matrix(0.0f);
-        
+    
         update_matrix();
     }
     // using catch(...) because every caught exception is rethrown
@@ -61,23 +56,9 @@ Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const
 
 void Model::draw() const
 {
-    check_render( device->SetStreamSource( 0, vertex_buffer, 0, sizeof(Vertex) ) );
+    check_render( device->SetStreamSource( 0, vertex_buffer, 0, vertex_size ) );
     check_render( device->SetIndices( index_buffer ) );
-    check_render( device->DrawIndexedPrimitive( primitive_type , 0, 0, vertices_count, 0, primitives_count ) );
-}
-
-void Model::set_bones(float time)
-{
-    // first bone will set the rotation
-    float angle = SKINNING_ANGLE*sin(SKINNING_OMEGA*time);
-    bones[0] = rotate_x_matrix( angle, bone_center );
-    // others will still be a unity matrix
-}
-
-const D3DXMATRIX &Model::get_bone(unsigned number) const
-{
-    _ASSERT( number < BONES_COUNT );
-    return bones[number];
+    check_render( device->DrawIndexedPrimitive( primitive_type, 0, 0, vertices_count, 0, primitives_count ) );
 }
 
 void Model::update_matrix()
@@ -99,4 +80,31 @@ void Model::release_interfaces()
 Model::~Model()
 {
     release_interfaces();
+}
+
+// -------------------------------------- SkinningModel -------------------------------------------------------------
+
+SkinningModel::SkinningModel(IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const SkinningVertex *vertices,
+                             unsigned int vertices_count, const Index *indices, unsigned int indices_count,
+                             unsigned int primitives_count, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 bone_center)
+: Model(device, primitive_type, sizeof(SkinningVertex), vertices, vertices_count, indices, indices_count, primitives_count, position, rotation),
+  bone_center(bone_center)
+{
+    _ASSERT( BONES_COUNT <= sizeof(D3DXVECTOR4) ); // to fit weights into vertex shader register
+    for(unsigned i = 0; i < BONES_COUNT; ++i)
+        bones[i] = rotate_x_matrix(0.0f);
+}
+
+const D3DXMATRIX &SkinningModel::get_bone(unsigned number) const
+{
+    _ASSERT( number < BONES_COUNT );
+    return bones[number];
+}
+
+void SkinningModel::set_time(float time)
+{
+    // first bone will set the rotation
+    float angle = SKINNING_ANGLE*sin(SKINNING_OMEGA*time);
+    bones[0] = rotate_x_matrix( angle, bone_center );
+    // others will still be a unity matrix
 }

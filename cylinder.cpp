@@ -1,8 +1,8 @@
 #include "cylinder.h"
 
-const Index CYLINDER_EDGES_PER_BASE = 400;
+const Index CYLINDER_EDGES_PER_BASE = 300;
 const Index CYLINDER_EDGES_PER_HEIGHT = 300;
-const Index CYLINDER_EDGES_PER_CAP = 350;
+const Index CYLINDER_EDGES_PER_CAP = 250;
 
 const Index CYLINDER_VERTICES_COUNT 
     = (CYLINDER_EDGES_PER_BASE)*((CYLINDER_EDGES_PER_HEIGHT + 1) + 2 + 2*(CYLINDER_EDGES_PER_CAP -1)) // vertices per CYLINDER_EDGES_PER_HEIGHT+1 levels plus last ans first levels again, plus CYLINDER_EDGES_PER_CAP-1 levels per each of 2 caps
@@ -18,7 +18,7 @@ namespace
     struct GENERATION_PARAMS
     {
         // output buffers
-        Vertex *res_vertices;
+        SkinningVertex *res_vertices;
         Index *res_indices;
         // sizes
         float radius;
@@ -83,7 +83,7 @@ namespace
                     ++vertex;
                     continue;
                 }
-                params.res_vertices[vertex] = Vertex(position, color, weight, normal);
+                params.res_vertices[vertex] = SkinningVertex(position, color, weight, normal);
                 if( level != 0 )
                 {
                     params.res_indices[index++] = vertex - CYLINDER_EDGES_PER_BASE; // from previous level
@@ -101,7 +101,7 @@ namespace
         {
             // for caps: add center vertex and triangles with it
             D3DXVECTOR3 position = D3DXVECTOR3( 0, 0, z_if_horisontal );
-            params.res_vertices[vertex] = Vertex( position, params.colors[0], weight_if_horisontal, normal_if_horisontal );
+            params.res_vertices[vertex] = SkinningVertex( position, params.colors[0], weight_if_horisontal, normal_if_horisontal );
             for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
             {
                 params.res_indices[index++] = vertex - CYLINDER_EDGES_PER_BASE + step;
@@ -115,7 +115,7 @@ namespace
 
 void cylinder( float radius, float height,
                const D3DCOLOR *colors, unsigned colors_count,
-               Vertex *res_vertices, Index *res_indices)
+               SkinningVertex *res_vertices, Index *res_indices)
 // Writes data into arrays given as `res_vertices' and `res_indices',
 {
     Index vertex = 0; // current vertex
@@ -150,9 +150,9 @@ void cylinder( float radius, float height,
     const float STEP_UP = params.height/CYLINDER_EDGES_PER_HEIGHT;
     for( unsigned level = CYLINDER_EDGES_PER_HEIGHT; level != 0; --level )
     {
-        res_vertices[vertex] = Vertex( D3DXVECTOR3(0, 0, level*STEP_UP),
-                                       static_cast<float>(level)/CYLINDER_EDGES_PER_HEIGHT,
-                                       D3DXVECTOR3(0,0,1.0f) );
+        res_vertices[vertex] = SkinningVertex( D3DXVECTOR3(0, 0, level*STEP_UP),
+                                               static_cast<float>(level)/CYLINDER_EDGES_PER_HEIGHT,
+                                               D3DXVECTOR3(0,0,1.0f) );
         res_indices[index++] = vertex;
         ++vertex;
     }

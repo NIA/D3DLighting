@@ -108,7 +108,7 @@ void Application::init_device()
 
 void Application::init_shader()
 {
-    if( FAILED( device->CreateVertexDeclaration(VERTEX_DECL_ARRAY, &vertex_decl) ) )
+    if( FAILED( device->CreateVertexDeclaration(SKINNING_VERTEX_DECL_ARRAY, &vertex_decl) ) )
         throw VertexDeclarationInitError();
 
     ID3DXBuffer * shader_buffer = NULL;
@@ -164,12 +164,17 @@ void Application::render()
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
     {
-        unsigned offset = SHADER_REG_BONE_MX;
-        (*iter)->set_bones(time); // re-initialize bones
-        for(unsigned i = 0; i < BONES_COUNT; ++i)
+        (*iter)->set_time(time);
+        SkinningModel *skinning_model = dynamic_cast<SkinningModel*>(*iter);
+        if( skinning_model != NULL)
         {
-            set_shader_matrix(offset, (*iter)->get_bone(i));
-            offset += VECTORS_IN_MATRIX;
+            // if it is really a SkinningModel
+            unsigned offset = SHADER_REG_BONE_MX;
+            for(unsigned i = 0; i < BONES_COUNT; ++i)
+            {
+                set_shader_matrix(offset, skinning_model->get_bone(i));
+                offset += VECTORS_IN_MATRIX;
+            }
         }
         set_shader_matrix( SHADER_REG_POS_AND_ROT_MX, (*iter)->get_rotation_and_position() );
         (*iter)->draw();

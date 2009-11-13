@@ -24,32 +24,47 @@ public:
     D3DXVECTOR3 pos;            // The position for the vertex
     D3DXVECTOR4 normal;         // The outer normal of model
     D3DCOLOR color;             // The vertex color
+    void set_normal(D3DXVECTOR3 tri_normal)
+    {
+        normal = D3DXVECTOR4(tri_normal, 0); // normal is a vector, not a point!
+    }
+    Vertex() : color(0)
+    {
+        set_normal(D3DXVECTOR3(1.0f, 0, 0));
+    }
+    Vertex(D3DXVECTOR3 pos, D3DCOLOR color, D3DXVECTOR3 normal) : pos(pos), color(color)
+    {
+        set_normal(normal);
+    }
+    Vertex(D3DXVECTOR3 pos, D3DXVECTOR3 normal) : pos(pos)
+    {
+        color = random_color();
+        set_normal(normal);
+    }
+};
+
+class SkinningVertex : public Vertex
+{
+public:
     float weights[BONES_COUNT]; // Weights for skinning
     void set_weight(float weight)
     {
         weights[0] = weight;
         weights[1] = 1 - weight;
     }
-    void set_normal(D3DXVECTOR3 tri_normal)
-    {
-        normal = D3DXVECTOR4(tri_normal, 0); // normal is a vector, not a point!
-    }
-    Vertex() : pos(), color(0)
+    SkinningVertex()
     {
         set_weight(1.0f);
-        set_normal(D3DXVECTOR3(1.0f, 0, 0));
     }
-    Vertex(D3DXVECTOR3 pos, D3DCOLOR color, float weight, D3DXVECTOR3 normal) : pos(pos), color(color)
+    SkinningVertex(D3DXVECTOR3 pos, D3DCOLOR color, float weight, D3DXVECTOR3 normal) : Vertex(pos, color, normal)
     {
         set_weight(weight);
-        set_normal(normal);
     }
-    Vertex(D3DXVECTOR3 pos, float weight, D3DXVECTOR3 normal) : pos(pos)
+    SkinningVertex(D3DXVECTOR3 pos, float weight, D3DXVECTOR3 normal) : Vertex(pos, normal)
     {
-        color = random_color();
         set_weight(weight);
-        set_normal(normal);
     }
 };
 
 extern const D3DVERTEXELEMENT9 VERTEX_DECL_ARRAY[];
+extern const D3DVERTEXELEMENT9 SKINNING_VERTEX_DECL_ARRAY[];
