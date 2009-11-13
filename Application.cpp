@@ -110,11 +110,11 @@ void Application::render()
     //     c21 is eye position
     set_shader_point(21, camera.get_eye());
     //     c22 is spot light position
-    set_shader_point(22, D3DXVECTOR3(1.3f, 0.5f, -1.3f));
+    set_shader_point(22, D3DXVECTOR3(1.3f, -0.5f, -1.3f));
     //     c23 is spot light color
     set_shader_color(23, D3DCOLOR_XRGB(217, 255, 0));
     //     c24 is spot light direction
-    D3DXVECTOR3 spot_vector(2.0f + sin(4*time)/2, 0.5f, -1.1f);
+    D3DXVECTOR3 spot_vector(2.0f, -0.7f, -1.1f);
     D3DXVec3Normalize(&spot_vector, &spot_vector);
     set_shader_vector(24, spot_vector);
     //     c25 is cos( spot light inner angle )
