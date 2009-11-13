@@ -67,7 +67,7 @@ namespace
 }
 
 Application::Application() :
-    d3d(NULL), device(NULL), window(WINDOW_SIZE, WINDOW_SIZE), camera(2.9f, 1.5f, 0.0f), // Constants selected for better view of cylinder
+    d3d(NULL), device(NULL), window(WINDOW_SIZE, WINDOW_SIZE), camera(3.2f, 1.5f, 0.0f), // Constants selected for better view of cylinder
     directional_light_enabled(true), point_light_enabled(true), spot_light_enabled(true), ambient_light_enabled(true)
 {
     try
