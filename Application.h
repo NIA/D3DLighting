@@ -37,7 +37,7 @@ private:
     }
     void set_shader_float(unsigned reg, float f)
     {
-        set_shader_const(reg, D3DXVECTOR4(f, 0,0,0), 1);
+        set_shader_const(reg, D3DXVECTOR4(f, f, f, f), 1);
     }
     void set_shader_vector(unsigned reg, const D3DXVECTOR3 &vector)
     {

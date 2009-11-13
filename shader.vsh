@@ -25,6 +25,7 @@ dcl_normal v3
 ;; c26 is cos(spotlight_outer_angle);;
 ;;                                  ;;
 ;; c100 is constant 0.0f            ;;
+;; c111 is constant 1.0f            ;;
 ;;                                  ;;
 ;; r0  is vertex after 1st bone     ;;
 ; ?r0  is attenuation               ;;
@@ -43,6 +44,7 @@ dcl_normal v3
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 def c100, 0.0, 0.0, 0.0, 0.0
+def c111, 1.0, 1.0, 1.0, 1.0
 
 ;;;;;;;;;;;;;;;;;;;;;; Skinning ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; - - - - - - - - - -  position  - - - - - - - - - - - - - -;
@@ -144,12 +146,19 @@ dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
 dp3 r0, r2, c18         ; r0 = (a + b*d + c*d**2)
 rcp r0, r0              ; r0 = attenuation coef
 ; calculating bounds
-dp3 r3, r11, c24        ; r3 = cos( l, d ), where l is vector vertex-light, d is spot light direction
-sge r2, r3.x, c25.x     ; r2 = if angle r3 < inner angle
+dp3 r3, r11, c24        ; r3 = x = cos( l, d ), where l is vector vertex-light, d is spot light direction
+add r3, r3, -c26        ; r3 = x - OUT
+mov r7, c25             ; r7 = IN
+add r7, r7, -c26        ; r7 = IN - OUT
+rcp r7.x, r7.x          ; r7 = 1/(IN - OUT)
+mul r2, r3, r7          ; r2 = (x - OUT)/(IN - OUT) - linear interpolation
+max r2, r2, c100        ; r2 = 0 if r2 < 0
+max r2, -r2, -c111      ; r2 = -1 if r2 > 1, else -r2
+mov r2, -r2
 mul r0, r0, r2.x        ; attenuation *= r2
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
 mov r3, c14             ; r3 = coef(diffuse)
-mul r4, c23, r3.x       ; r4 = I(point)*coef(diffuse)
+mul r4, c23, r3.x       ; r4 = I(spot)*coef(diffuse)
 mul r4, r4, r5.x        ; r4 *= cos(theta)
 mul r4, r4, r0.x        ; r4 *= attenuation
 
