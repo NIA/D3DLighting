@@ -21,8 +21,8 @@ dcl_normal v3
 ;; c22 is spot light position       ;;
 ;; c23 is spot light color          ;;
 ;; c24 is spot light direction      ;;
-;; c25 is cos(spotlight_inner_angle);;
-;; c26 is cos(spotlight_outer_angle);;
+;; c25 is 1/(IN - OUT)              ;;
+;; c26 is OUT/(IN - OUT)            ;;
 ;; c27 - c30 is pos.*rot. matrix    ;;
 ;;                                  ;;
 ;; c100 is constant 0.0f            ;;
@@ -31,7 +31,7 @@ dcl_normal v3
 ; ?r0  is attenuation               ;;
 ; !r1  is transformed vertex        ;;
 ;; r2  is r (for specular)          ;;
-; ?r3  is diff/spec coefficient     ;;
+;; r3  is temp                      ;;
 ;; r4  is light intensity           ;;
 ; !r5  is cos(theta)                ;;
 ; !r6  is result color              ;;
@@ -70,17 +70,15 @@ mul r9, r9, r7.x       ; normalize r9
 ;;;;;;;;;;;;;;;;;;;;; Directional ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 dp3 r5, c12, r10        ; r5 = cos(theta)
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
-mov r3, c14             ; r3 = coef(diffuse)
-mul r4, c13, r3.x       ; r4 = I(direct)*coef(diffuse)
-mul r4, r4, r5.x        ; r4 *= cos(theta)
+mul r4, c13, r5.x       ; r4 = I(direct)*cos(theta)
+mul r4, r4, c14.x       ; r4 *= coef(diffuse)
 
 max r6, r4, c100        ; if some color comp. < 0 => make it == 0
 ; - - - - - - - - - - - specular - - - - - - - - - - - - - -;
-mov r3, c19             ; r3 = coef(specular)
 ; calculating r:
-mul r2, r10, r5.x   ; r2 = (l, n)*n
-add r2, r2, r2      ; r2 = 2*(l, n)*n
-add r2, r2, -c12    ; r2 = 2*(l, n)*n - l
+mul r2, r10, r5.x     ; r2 = 2*(l, n)*n
+add r2, r2, r2        ; r2 = 2*(l, n)*n
+add r2, r2, -c12      ; r2 = 2*(l, n)*n - l
 ; calculating cos(phi)**f
 dp3 r8, r2, r9          ; r8 = cos(phi)
 max r8, r8, c100        ; if cos < 0, let it = 0
@@ -88,8 +86,8 @@ mov r7.y, r8.x
 mov r7.w, c20.x
 lit r8, r7              ; r8.z = cos(phi)**f
 
-mul r4, c13, r3.x       ; r4 = I(direct)*coef(specular)
-mul r4, r4, r8.z        ; r4 *= cos(phi)**f
+mul r4, c13, r8.z       ; r4 = I(direct)*cos(phi)**f
+mul r4, r4, c19.x       ; r4 *= coef(specular)
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
@@ -107,15 +105,13 @@ dst r2, r2, r7          ; r2 = (1, d, d**2, 1/d)
 dp3 r0, r2, c18         ; r0 = (a + b*d + c*d**2)
 rcp r0, r0              ; r0 = attenuation coef
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
-mov r3, c14             ; r3 = coef(diffuse)
-mul r4, c16, r3.x       ; r4 = I(point)*coef(diffuse)
-mul r4, r4, r5.x        ; r4 *= cos(theta)
+mul r4, c16, r5.x       ; r4 = I(point)*cos(theta)
+mul r4, r4, c14.x        ; r4 *= coef(diffuse)
 mul r4, r4, r0.x        ; r4 *= attenuation
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
 ; - - - - - - - - - - - specular - - - - - - - - - - - - - -;
-mov r3, c19             ; r3 = coef(specular)
 ; calculating r:
 mul r2, r10, r5.x   ; r2 = (l, n)*n
 add r2, r2, r2      ; r2 = 2*(l, n)*n
@@ -127,8 +123,8 @@ mov r7.y, r8.x
 mov r7.w, c20.x
 lit r8, r7              ; r8.z = cos(phi)**f
 
-mul r4, c16, r3.x       ; r4 = I(point)*coef(specular)
-mul r4, r4, r8.z        ; r4 *= cos(phi)**f
+mul r4, c16, r8.z       ; r4 = I(point)*cos(phi)**f
+mul r4, r4, c19.x       ; r4 *= coef(specular)
 mul r4, r4, r0.x        ; r4 *= attenuation
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
@@ -148,25 +144,19 @@ dp3 r0, r2, c18         ; r0 = (a + b*d + c*d**2)
 rcp r0, r0              ; r0 = attenuation coef
 ; calculating bounds
 dp3 r3, r11, c24        ; r3 = x = cos( l, d ), where l is vector vertex-light, d is spot light direction
-add r3, r3, -c26        ; r3 = x - OUT
-mov r7, c25             ; r7 = IN
-add r7, r7, -c26        ; r7 = IN - OUT
-rcp r7.x, r7.x          ; r7 = 1/(IN - OUT)
-mul r2, r3, r7          ; r2 = (x - OUT)/(IN - OUT) - linear interpolation
+mov r7, c25             ; r7 = 1/(IN - OUT)
+mad r2, r3, r7, -c26    ; r2 = (x - OUT)/(IN - OUT) - linear interpolation
 max r2, r2, c100        ; r2 = 0 if r2 < 0
-max r2, -r2, -c111      ; r2 = -1 if r2 > 1, else -r2
-mov r2, -r2
-mul r0, r0, r2.x        ; attenuation *= r2
+max r2, -r2, -c111      ; -bounds = -1 if r2 > 1, else -r2
+mul r0, r0, -r2.x       ; attenuation *= bounds
 ; - - - - - - - - - - - diffuse - - - - - - - - - - - - - - ;
-mov r3, c14             ; r3 = coef(diffuse)
-mul r4, c23, r3.x       ; r4 = I(spot)*coef(diffuse)
-mul r4, r4, r5.x        ; r4 *= cos(theta)
+mul r4, c23, r5.x       ; r4 = I(spot)*cos(theta)
+mul r4, r4, c14.x       ; r4 *= coef(diffuse)
 mul r4, r4, r0.x        ; r4 *= attenuation
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0
 add r6, r6, r4
 ; - - - - - - - - - - - specular - - - - - - - - - - - - - -;
-mov r3, c19             ; r3 = coef(specular)
 ; calculating r:
 mul r2, r10, r5.x   ; r2 = (l, n)*n
 add r2, r2, r2      ; r2 = 2*(l, n)*n
@@ -178,8 +168,8 @@ mov r7.y, r8.x
 mov r7.w, c20.x
 lit r8, r7              ; r8.z = cos(phi)**f
 
-mul r4, c23, r3.x       ; r4 = I(spot)*coef(specular)
-mul r4, r4, r8.z        ; r4 *= cos(phi)**f
+mul r4, c23, r8.z       ; r4 = I(spot)*cos(phi)**f
+mul r4, r4, c19.x       ; r4 *= coef(specular)
 mul r4, r4, r0.x        ; r4 *= attenuation
 
 max r4, r4, c100        ; if some color comp. < 0 => make it == 0

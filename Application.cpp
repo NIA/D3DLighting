@@ -56,12 +56,12 @@ namespace
     const unsigned    SHADER_REG_SPOT_VECTOR = 24;
     const D3DXVECTOR3 SHADER_VAL_SPOT_VECTOR  (1.0f, 1.0f, -0.5f);
     D3DXVECTOR3 spot_vector(2.0f, -0.7f, -1.1f);
-    //    c25 is cos( spot light inner angle )
-    const unsigned    SHADER_REG_SPOT_INNER_ANGLE = 25;
+    //    c25 is 1/(IN - OUT)
     const float       SHADER_VAL_SPOT_INNER_ANGLE = D3DX_PI/16.0f;
-    //    c26 is cos( spot light outer angle )
-    const unsigned    SHADER_REG_SPOT_OUTER_ANGLE = 26;
     const float       SHADER_VAL_SPOT_OUTER_ANGLE = D3DX_PI/12.0f;
+    const unsigned    SHADER_REG_SPOT_X_COEF = 25;
+    //    c26 is OUT/(IN - OUT)
+    const unsigned    SHADER_REG_SPOT_CONST_COEF = 26;
     //    c27-c30 is position and rotation of model matrix
     const unsigned    SHADER_REG_POS_AND_ROT_MX = 27;
 }
@@ -123,6 +123,10 @@ void Application::render()
     D3DCOLOR point_color = point_light_enabled ? SHADER_VAL_POINT_COLOR : BLACK;
     D3DCOLOR spot_color = spot_light_enabled ? SHADER_VAL_SPOT_COLOR : BLACK;
 
+    float in_cos = cos(SHADER_VAL_SPOT_INNER_ANGLE);
+    float out_cos = cos(SHADER_VAL_SPOT_OUTER_ANGLE);
+    _ASSERT( in_cos - out_cos != 0.0f );
+
     set_shader_matrix( SHADER_REG_VIEW_MX,            camera.get_matrix());
     set_shader_vector( SHADER_REG_DIRECTIONAL_VECTOR, directional_vector);
     set_shader_color(  SHADER_REG_DIRECTIONAL_COLOR,  directional_color);
@@ -137,8 +141,8 @@ void Application::render()
     set_shader_point(  SHADER_REG_SPOT_POSITION,      SHADER_VAL_SPOT_POSITION);
     set_shader_color(  SHADER_REG_SPOT_COLOR,         spot_color);
     set_shader_vector( SHADER_REG_SPOT_VECTOR,        spot_vector);
-    set_shader_float(  SHADER_REG_SPOT_INNER_ANGLE,   cos(SHADER_VAL_SPOT_INNER_ANGLE));
-    set_shader_float(  SHADER_REG_SPOT_OUTER_ANGLE,   cos(SHADER_VAL_SPOT_OUTER_ANGLE));
+    set_shader_float(  SHADER_REG_SPOT_X_COEF,        1/(in_cos - out_cos));
+    set_shader_float(  SHADER_REG_SPOT_CONST_COEF,    out_cos/(in_cos - out_cos));
     std::list<Model*>::iterator end = models.end();
     for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
     {
@@ -216,9 +220,6 @@ void Application::process_key(unsigned code)
     case VK_RIGHT:
     case 'D':
         camera.move_counterclockwise();
-        break;
-    case VK_SPACE:
-        toggle_wireframe();
         break;
     case '1':
         directional_light_enabled = !directional_light_enabled;
