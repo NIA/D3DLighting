@@ -9,6 +9,7 @@ namespace
     const D3DCOLOR    BACKGROUND_COLOR = D3DCOLOR_XRGB( 5, 5, 10 );
     const bool        INITIAL_WIREFRAME_STATE = false;
     const unsigned    D3DXVEC_SIZE = sizeof(D3DXVECTOR4);
+    const D3DCOLOR    BLACK = D3DCOLOR_XRGB( 0, 0, 0 );
 
     //---------------- SHADER CONSTANTS ---------------------------
     //    c0-c3 is the view matrix
@@ -66,7 +67,8 @@ namespace
 }
 
 Application::Application() :
-    d3d(NULL), device(NULL), window(WINDOW_SIZE, WINDOW_SIZE), camera(2.9f, 1.5f, 0.0f) // Constants selected for better view of cylinder
+    d3d(NULL), device(NULL), window(WINDOW_SIZE, WINDOW_SIZE), camera(2.9f, 1.5f, 0.0f), // Constants selected for better view of cylinder
+    directional_light_enabled(true), point_light_enabled(true), spot_light_enabled(true), ambient_light_enabled(true)
 {
     try
     {
@@ -116,19 +118,24 @@ void Application::render()
     D3DXVECTOR3 spot_vector;
     D3DXVec3Normalize(&spot_vector, &SHADER_VAL_SPOT_VECTOR);
 
+    D3DCOLOR ambient_color = ambient_light_enabled ? SHADER_VAL_AMBIENT_COLOR : BLACK;
+    D3DCOLOR directional_color = directional_light_enabled ? SHADER_VAL_DIRECTIONAL_COLOR : BLACK;
+    D3DCOLOR point_color = point_light_enabled ? SHADER_VAL_POINT_COLOR : BLACK;
+    D3DCOLOR spot_color = spot_light_enabled ? SHADER_VAL_SPOT_COLOR : BLACK;
+
     set_shader_matrix( SHADER_REG_VIEW_MX,            camera.get_matrix());
     set_shader_vector( SHADER_REG_DIRECTIONAL_VECTOR, directional_vector);
-    set_shader_color(  SHADER_REG_DIRECTIONAL_COLOR,  SHADER_VAL_DIRECTIONAL_COLOR);
+    set_shader_color(  SHADER_REG_DIRECTIONAL_COLOR,  directional_color);
     set_shader_float(  SHADER_REG_DIFFUSE_COEF,       SHADER_VAL_DIFFUSE_COEF);
-    set_shader_color(  SHADER_REG_AMBIENT_COLOR,      SHADER_VAL_AMBIENT_COLOR);
-    set_shader_color(  SHADER_REG_POINT_COLOR,        SHADER_VAL_POINT_COLOR);
+    set_shader_color(  SHADER_REG_AMBIENT_COLOR,      ambient_color);
+    set_shader_color(  SHADER_REG_POINT_COLOR,        point_color);
     set_shader_point(  SHADER_REG_POINT_POSITION,     SHADER_VAL_POINT_POSITION);
     set_shader_vector( SHADER_REG_ATTENUATION,        SHADER_VAL_ATTENUATION);
     set_shader_float(  SHADER_REG_SPECULAR_COEF,      SHADER_VAL_SPECULAR_COEF);
     set_shader_float(  SHADER_REG_SPECULAR_F,         SHADER_VAL_SPECULAR_F);
     set_shader_point(  SHADER_REG_EYE,                camera.get_eye());
     set_shader_point(  SHADER_REG_SPOT_POSITION,      SHADER_VAL_SPOT_POSITION);
-    set_shader_color(  SHADER_REG_SPOT_COLOR,         SHADER_VAL_SPOT_COLOR);
+    set_shader_color(  SHADER_REG_SPOT_COLOR,         spot_color);
     set_shader_vector( SHADER_REG_SPOT_VECTOR,        spot_vector);
     set_shader_float(  SHADER_REG_SPOT_INNER_ANGLE,   cos(SHADER_VAL_SPOT_INNER_ANGLE));
     set_shader_float(  SHADER_REG_SPOT_OUTER_ANGLE,   cos(SHADER_VAL_SPOT_OUTER_ANGLE));
@@ -212,6 +219,18 @@ void Application::process_key(unsigned code)
         break;
     case VK_SPACE:
         toggle_wireframe();
+        break;
+    case '1':
+        directional_light_enabled = !directional_light_enabled;
+        break;
+    case '2':
+        point_light_enabled = !point_light_enabled;
+        break;
+    case '3':
+        spot_light_enabled = !spot_light_enabled;
+        break;
+    case '4':
+        ambient_light_enabled = !ambient_light_enabled;
         break;
     }
 }

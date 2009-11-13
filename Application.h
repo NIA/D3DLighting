@@ -18,6 +18,11 @@ private:
     IDirect3D9                  *d3d;           // used to create the D3DDevice
     IDirect3DDevice9            *device;        // our rendering device
 
+    bool directional_light_enabled;
+    bool point_light_enabled;
+    bool spot_light_enabled;
+    bool ambient_light_enabled;
+
     Window window;
 
     std::list<Model*> models;
