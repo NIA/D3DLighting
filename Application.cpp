@@ -14,8 +14,8 @@ namespace
     //---------------- SHADER CONSTANTS ---------------------------
     //    c0-c3 is the view matrix
     const unsigned    SHADER_REG_VIEW_MX = 0;
-    //   c4-c7 is the first bone matrix
-    //   c8-c11 is the second bone matrix
+    //    c4-c7 is the first bone matrix
+    //    c8-c11 is the second bone matrix
     const unsigned    SHADER_REG_BONE_MX = 4;
     //    c12 is directional light vector
     const unsigned    SHADER_REG_DIRECTIONAL_VECTOR = 12;
@@ -38,30 +38,32 @@ namespace
     //    c18 are attenuation constants
     const unsigned    SHADER_REG_ATTENUATION = 18;
     const D3DXVECTOR3 SHADER_VAL_ATTENUATION  (1.0f, 0, 0.5f);
-    //     c19 is specular coefficient
+    //    c19 is specular coefficient
     const unsigned    SHADER_REG_SPECULAR_COEF = 19;
     const float       SHADER_VAL_SPECULAR_COEF = 0.4f;
-    //     c20 is specular constant 'f'
+    //    c20 is specular constant 'f'
     const unsigned    SHADER_REG_SPECULAR_F = 20;
     const float       SHADER_VAL_SPECULAR_F = 15.0f;
-    //     c21 is eye position
+    //    c21 is eye position
     const unsigned    SHADER_REG_EYE = 21;
-    //     c22 is spot light position
+    //    c22 is spot light position
     const unsigned    SHADER_REG_SPOT_POSITION = 22;
-    const D3DXVECTOR3 SHADER_VAL_SPOT_POSITION  (1.3f, -0.5f, -1.3f);
-    //     c23 is spot light color
+    const D3DXVECTOR3 SHADER_VAL_SPOT_POSITION  (1.5f, 1.5f, -1.3f);
+    //    c23 is spot light color
     const unsigned    SHADER_REG_SPOT_COLOR = 23;
-    const D3DCOLOR    SHADER_VAL_SPOT_COLOR = D3DCOLOR_XRGB(217, 255, 0);
-    //     c24 is spot light direction
+    const D3DCOLOR    SHADER_VAL_SPOT_COLOR = D3DCOLOR_XRGB(255, 0, 180);
+    //    c24 is spot light direction
     const unsigned    SHADER_REG_SPOT_VECTOR = 24;
-    const D3DXVECTOR3 SHADER_VAL_SPOT_VECTOR  (2.0f, -0.7f, -1.1f);
+    const D3DXVECTOR3 SHADER_VAL_SPOT_VECTOR  (1.0f, 1.0f, -0.5f);
     D3DXVECTOR3 spot_vector(2.0f, -0.7f, -1.1f);
-    //     c25 is cos( spot light inner angle )
+    //    c25 is cos( spot light inner angle )
     const unsigned    SHADER_REG_SPOT_INNER_ANGLE = 25;
     const float       SHADER_VAL_SPOT_INNER_ANGLE = D3DX_PI/16.0f;
-    //     c26 is cos( spot light outer angle )
+    //    c26 is cos( spot light outer angle )
     const unsigned    SHADER_REG_SPOT_OUTER_ANGLE = 26;
     const float       SHADER_VAL_SPOT_OUTER_ANGLE = D3DX_PI/12.0f;
+    //    c27-c30 is position and rotation of model matrix
+    const unsigned    SHADER_REG_POS_AND_ROT_MX = 27;
 }
 
 Application::Application() :
@@ -169,6 +171,7 @@ void Application::render()
             set_shader_matrix(offset, (*iter)->get_bone(i));
             offset += VECTORS_IN_MATRIX;
         }
+        set_shader_matrix( SHADER_REG_POS_AND_ROT_MX, (*iter)->get_rotation_and_position() );
         (*iter)->draw();
     }
     // End the scene

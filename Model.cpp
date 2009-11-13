@@ -10,10 +10,11 @@ namespace
 
 Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const Vertex *vertices,
                 unsigned vertices_count, const Index *indices, unsigned indices_count,
-                unsigned primitives_count, D3DXVECTOR3 rotate_center )
-
+                unsigned primitives_count, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 bone_center )
+ 
 : device(device), vertices_count(vertices_count), primitives_count(primitives_count),
-  primitive_type(primitive_type), vertex_buffer(NULL), index_buffer(NULL), rotate_center(rotate_center)
+  primitive_type(primitive_type), vertex_buffer(NULL), index_buffer(NULL),
+  position(position), rotation(rotation), bone_center(bone_center)
 {
     _ASSERT(vertices != NULL);
     _ASSERT(indices != NULL);
@@ -47,6 +48,8 @@ Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, const
         _ASSERT( BONES_COUNT <= sizeof(D3DXVECTOR4) ); // to fit weights into vertex shader register
         for(unsigned i = 0; i < BONES_COUNT; ++i)
             bones[i] = rotate_x_matrix(0.0f);
+        
+        update_matrix();
     }
     // using catch(...) because every caught exception is rethrown
     catch(...)
@@ -67,7 +70,7 @@ void Model::set_bones(float time)
 {
     // first bone will set the rotation
     float angle = SKINNING_ANGLE*sin(SKINNING_OMEGA*time);
-    bones[0] = rotate_x_matrix( angle, rotate_center );
+    bones[0] = rotate_x_matrix( angle, bone_center );
     // others will still be a unity matrix
 }
 
@@ -75,6 +78,16 @@ const D3DXMATRIX &Model::get_bone(unsigned number) const
 {
     _ASSERT( number < BONES_COUNT );
     return bones[number];
+}
+
+void Model::update_matrix()
+{
+    rotation_and_position = rotate_and_shift_matrix(rotation, position);
+}
+
+const D3DXMATRIX &Model::get_rotation_and_position() const
+{
+    return rotation_and_position;
 }
 
 void Model::release_interfaces()

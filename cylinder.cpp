@@ -21,7 +21,6 @@ namespace
         Vertex *res_vertices;
         Index *res_indices;
         // sizes
-        D3DXVECTOR3 base_center;
         float radius;
         float height;
         // colors
@@ -66,9 +65,9 @@ namespace
                     z = z_if_horisontal;
                     weight = weight_if_horisontal;
                 }
-                D3DXVECTOR3 position = params.base_center + D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
-                                                                         radius*sin(step*STEP_ANGLE),
-                                                                         z);
+                D3DXVECTOR3 position = D3DXVECTOR3( radius*cos(step*STEP_ANGLE),
+                                                    radius*sin(step*STEP_ANGLE),
+                                                    z);
                 D3DCOLOR color = params.radial_strips ? params.colors[step/part_size] : params.colors[level/part_size];
 
                 if( level == 0 && !params.vertical)
@@ -101,7 +100,7 @@ namespace
         if( !params.vertical )
         {
             // for caps: add center vertex and triangles with it
-            D3DXVECTOR3 position = params.base_center + D3DXVECTOR3( 0, 0, z_if_horisontal );
+            D3DXVECTOR3 position = D3DXVECTOR3( 0, 0, z_if_horisontal );
             params.res_vertices[vertex] = Vertex( position, params.colors[0], weight_if_horisontal, normal_if_horisontal );
             for( Index step = 0; step < CYLINDER_EDGES_PER_BASE; ++step )
             {
@@ -114,7 +113,7 @@ namespace
     }
 }
 
-void cylinder( D3DXVECTOR3 base_center, float radius, float height,
+void cylinder( float radius, float height,
                const D3DCOLOR *colors, unsigned colors_count,
                Vertex *res_vertices, Index *res_indices)
 // Writes data into arrays given as `res_vertices' and `res_indices',
@@ -130,7 +129,6 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     params.res_vertices = res_vertices;
     params.res_indices = res_indices;
     // sizes
-    params.base_center = base_center;
     params.radius = radius;
     params.height = height;
     // colors
@@ -152,7 +150,7 @@ void cylinder( D3DXVECTOR3 base_center, float radius, float height,
     const float STEP_UP = params.height/CYLINDER_EDGES_PER_HEIGHT;
     for( unsigned level = CYLINDER_EDGES_PER_HEIGHT; level != 0; --level )
     {
-        res_vertices[vertex] = Vertex( base_center + D3DXVECTOR3(0, 0, level*STEP_UP),
+        res_vertices[vertex] = Vertex( D3DXVECTOR3(0, 0, level*STEP_UP),
                                        static_cast<float>(level)/CYLINDER_EDGES_PER_HEIGHT,
                                        D3DXVECTOR3(0,0,1.0f) );
         res_indices[index++] = vertex;

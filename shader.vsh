@@ -23,13 +23,13 @@ dcl_normal v3
 ;; c24 is spot light direction      ;;
 ;; c25 is cos(spotlight_inner_angle);;
 ;; c26 is cos(spotlight_outer_angle);;
+;; c27 - c30 is pos.*rot. matrix    ;;
 ;;                                  ;;
 ;; c100 is constant 0.0f            ;;
 ;; c111 is constant 1.0f            ;;
 ;;                                  ;;
-;; r0  is vertex after 1st bone     ;;
 ; ?r0  is attenuation               ;;
-; !r1  is vertex after 2nd bone     ;;
+; !r1  is transformed vertex        ;;
 ;; r2  is r (for specular)          ;;
 ; ?r3  is diff/spec coefficient     ;;
 ;; r4  is light intensity           ;;
@@ -38,8 +38,7 @@ dcl_normal v3
 ;; r7  is temp                      ;;
 ;; r8  is cos(phi) (specular)       ;;
 ; !r9  is normalized eye (v)        ;;
-;; r9  is normal after 1st bone     ;;
-; !r10 is normal after 2nd bone     ;;
+; !r10 is transformed normal        ;;
 ;; r11 is direction vector          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -48,15 +47,17 @@ def c111, 1.0, 1.0, 1.0, 1.0
 
 ;;;;;;;;;;;;;;;;;;;;;; Skinning ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; - - - - - - - - - -  position  - - - - - - - - - - - - - -;
-m4x4 r0, v0, c4
-mul r0.xyz, r0.xyz, v2.x
-m4x4 r1, v0, c8
-mad r1.xyz, r1.xyz, v2.y, r0.xyz
+m4x4 r1, v0, c4
+mul r1.xyz, r1.xyz, v2.x            ; first bone
+m4x4 r0, v0, c8
+mad r0.xyz, r0.xyz, v2.y, r1.xyz    ; second bone
+m4x4 r1, r0, c27                    ; position and rotation
 ; - - - - - - - - - -  normals  - - - - - - - - - - - - - - ;
-m4x4 r9, v3, c4
-mul r9.xyz, r9.xyz, v2.x
-m4x4 r10, v3, c8
-mad r10, r10, v2.y, r9.xyz
+m4x4 r10, v3, c4
+mul r10.xyz, r10.xyz, v2.x          ; first bone
+m4x4 r9, v3, c8
+mad r9.xyz, r9.xyz, v2.y, r10.xyz   ; second bone
+m4x4 r10, r9, c27                   ; position and rotation
 dp3 r2, r10, r10        ; r2 = |normal|**2
 rsq r7, r2              ; r7 = 1/|normal|
 mul r10, r10, r7.x      ; normalize r10
