@@ -34,6 +34,8 @@ void tessellate(const Vertex *src_vertices, const Index *src_indices, DWORD src_
     D3DXVec3Normalize(&normal, &normal);
 
     res_vertices[0] = src_vertices[i2];
+    res_vertices[0].set_normal(normal);
+    res_vertices[0].color = color;
     Index vertex = 1; // current vertex
     DWORD index = 0; // current index
     

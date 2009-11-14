@@ -40,6 +40,7 @@ namespace
 
         Index levels_count = params.vertical ? CYLINDER_EDGES_PER_HEIGHT + 1 : CYLINDER_EDGES_PER_CAP;
         Index levels_or_steps_count = params.radial_strips ? CYLINDER_EDGES_PER_BASE : levels_count;
+        _ASSERT(params.colors_count != 0);
         Index part_size = (levels_or_steps_count + params.colors_count)/params.colors_count; // `+ colors_count' just for excluding a bound of interval [0, colors_count)
         
         D3DXVECTOR3 normal_if_horisontal = D3DXVECTOR3(0, 0, params.top ? 1.0f : -1.0f);

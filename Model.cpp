@@ -7,7 +7,7 @@ namespace
     const float SKINNING_OMEGA = 2.0f*D3DX_PI/SKINNING_PERIOD;
     const float SKINNING_ANGLE = D3DX_PI/8.0f;
 
-    const float MORPHING_PERIOD = 1.0f;
+    const float MORPHING_PERIOD = 3.0f;
     const float MORPHING_OMEGA = 2.0f*D3DX_PI/MORPHING_PERIOD;
 }
 
@@ -139,5 +139,5 @@ float MorphingModel::get_final_radius() const
 
 void MorphingModel::set_time(float time)
 {
-    morphing_param = (sin(MORPHING_OMEGA*time) + 1.0f)/2.0f; // parameter of morhing: 0 to 1
+    morphing_param = (cos(MORPHING_OMEGA*time) + 1.0f)/2.0f; // parameter of morhing: 0 to 1
 }

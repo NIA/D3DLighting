@@ -16,6 +16,8 @@ namespace
         D3DCOLOR_XRGB(30, 250, 0),
         D3DCOLOR_XRGB(0, 150, 250),
     };
+    const D3DCOLOR SPHERE_COLOR = D3DCOLOR_XRGB(244, 244, 255);
+    const D3DCOLOR SECOND_CYLINDER_COLOR = D3DCOLOR_XRGB(30, 250, 0);
     const unsigned colors_count = array_size(colors);
 }
 
@@ -58,7 +60,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
 
         height = 2.3f;
         cylinder( 0.3f, height,
-                  colors, colors_count,
+                  &SECOND_CYLINDER_COLOR, 1,
                   cylinder_vertices, cylinder_indices );
 
         SkinningModel cylinder2(app.get_device(),
@@ -109,7 +111,7 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
         {
             tessellate( pyramid_vertices, pyramid_indices, i*VERTICES_PER_TRIANGLE,
                         &tesselated_vertices[i*TESSELATED_VERTICES_COUNT], i*TESSELATED_VERTICES_COUNT,
-                        &tesselated_indices[i*TESSELATED_INDICES_COUNT], colors[i%4 + i/4] );
+                        &tesselated_indices[i*TESSELATED_INDICES_COUNT], SPHERE_COLOR );
         }
         
         MorphingModel pyramid( app.get_device(),
