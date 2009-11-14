@@ -9,7 +9,11 @@ namespace
 
     const float MORPHING_PERIOD = 3.0f;
     const float MORPHING_OMEGA = 2.0f*D3DX_PI/MORPHING_PERIOD;
+
+    const unsigned MORPHING_CONSTANTS_USED = 2; // final radius and t
 }
+
+extern const unsigned VECTORS_IN_MATRIX;
 
 Model::Model(   IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitive_type, VertexShader &shader, unsigned vertex_size,
                 const Vertex *vertices, unsigned vertices_count, const Index *indices, unsigned indices_count,
@@ -103,18 +107,20 @@ SkinningModel::SkinningModel(IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitiv
         bones[i] = rotate_x_matrix(0.0f);
 }
 
-const D3DXMATRIX &SkinningModel::get_bone(unsigned number) const
-{
-    _ASSERT( number < BONES_COUNT );
-    return bones[number];
-}
-
 void SkinningModel::set_time(float time)
 {
     // first bone will set the rotation
     float angle = SKINNING_ANGLE*sin(SKINNING_OMEGA*time);
     bones[0] = rotate_x_matrix( angle, bone_center );
     // others will still be a unity matrix
+}
+
+unsigned SkinningModel::set_constants(D3DXVECTOR4 *out_data, unsigned buffer_size) const
+// returns number of constants used
+{
+    _ASSERT( buffer_size >= BONES_COUNT*VECTORS_IN_MATRIX ); // enough space?
+    memcpy(out_data, bones, BONES_COUNT*VECTORS_IN_MATRIX*sizeof(D3DXVECTOR4));
+    return BONES_COUNT*VECTORS_IN_MATRIX;
 }
 
 // -------------------------------------- SkinningModel -------------------------------------------------------------
@@ -127,17 +133,16 @@ MorphingModel::MorphingModel(IDirect3DDevice9 *device, D3DPRIMITIVETYPE primitiv
 {
 }
 
-float MorphingModel::get_mophing_param() const
-{
-    return morphing_param;
-}
-
-float MorphingModel::get_final_radius() const
-{
-    return final_radius;
-}
-
 void MorphingModel::set_time(float time)
 {
     morphing_param = (cos(MORPHING_OMEGA*time) + 1.0f)/2.0f; // parameter of morhing: 0 to 1
+}
+
+unsigned MorphingModel::set_constants(D3DXVECTOR4 *out_data, unsigned buffer_size) const
+// returns number of constants used
+{
+    _ASSERT( buffer_size >= MORPHING_CONSTANTS_USED); // enough space?
+    out_data[0] = D3DXVECTOR4(final_radius, final_radius, final_radius, final_radius);
+    out_data[1] = D3DXVECTOR4(morphing_param, morphing_param, morphing_param, morphing_param);
+    return MORPHING_CONSTANTS_USED;
 }

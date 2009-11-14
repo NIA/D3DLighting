@@ -8,15 +8,17 @@ namespace
     const int         WINDOW_SIZE = 600;
     const D3DCOLOR    BACKGROUND_COLOR = D3DCOLOR_XRGB( 5, 5, 10 );
     const bool        INITIAL_WIREFRAME_STATE = false;
-    const unsigned    D3DXVEC_SIZE = sizeof(D3DXVECTOR4);
     const D3DCOLOR    BLACK = D3DCOLOR_XRGB( 0, 0, 0 );
 
     //---------------- SHADER CONSTANTS ---------------------------
     //    c0-c3 is the view matrix
     const unsigned    SHADER_REG_VIEW_MX = 0;
-    //    c4-c7 is the first bone matrix
-    //    c8-c11 is the second bone matrix
-    const unsigned    SHADER_REG_BONE_MX = 4;
+    //    c4-c7 is the first bone matrix for SKINNING
+    //    c8-c11 is the second bone matrix for SKINNING
+    //    c4 is final radius for MORPHING
+    //    c5 is MORPHING parameter
+    const unsigned    SHADER_REG_MODEL_DATA = 4;
+    const unsigned    SHADER_SPACE_MODEL_DATA = 8; // number of registers available for
     //    c12 is directional light vector
     const unsigned    SHADER_REG_DIRECTIONAL_VECTOR = 12;
     const D3DXVECTOR3 SHADER_VAL_DIRECTIONAL_VECTOR  (0, 1.0f, 0.8f);
@@ -64,10 +66,6 @@ namespace
     const unsigned    SHADER_REG_SPOT_CONST_COEF = 26;
     //    c27-c30 is position and rotation of model matrix
     const unsigned    SHADER_REG_POS_AND_ROT_MX = 27;
-    //    c31 is final radius for morphing
-    const unsigned    SHADER_REG_FINAL_RADIUS = 31;
-    //    c32 is morphing parameter
-    const unsigned    SHADER_REG_MORPHING_PARAM = 32;
 }
 
 Application::Application() :
@@ -148,35 +146,17 @@ void Application::render()
     set_shader_float(  SHADER_REG_SPOT_X_COEF,        1/(in_cos - out_cos));
     set_shader_float(  SHADER_REG_SPOT_CONST_COEF,    out_cos/(in_cos - out_cos));
     
-    std::list<Model*>::iterator end = models.end();
-    for ( std::list<Model*>::iterator iter = models.begin(); iter != end; ++iter )
+    D3DXVECTOR4 model_constants[SHADER_SPACE_MODEL_DATA];
+    unsigned constants_used;
+    for ( Models::iterator iter = models.begin(); iter != models.end(); ++iter )
     {
         // Set up
         ( (*iter)->get_shader() ).set();
 
         // Setting constants
         (*iter)->set_time(time);
-        SkinningModel *skinning_model = dynamic_cast<SkinningModel*>(*iter);
-        if( skinning_model != NULL)
-        {
-            // if it is really a SkinningModel
-            unsigned offset = SHADER_REG_BONE_MX;
-            for(unsigned i = 0; i < BONES_COUNT; ++i)
-            {
-                set_shader_matrix(offset, skinning_model->get_bone(i));
-                offset += VECTORS_IN_MATRIX;
-            }
-        }
-        else
-        {
-            MorphingModel *morphing_model = dynamic_cast<MorphingModel*>(*iter);
-            if( morphing_model != NULL)
-            {
-                // if it is really a MorphingModel
-                set_shader_float(SHADER_REG_FINAL_RADIUS, morphing_model->get_final_radius());
-                set_shader_float(SHADER_REG_MORPHING_PARAM, morphing_model->get_mophing_param());
-            }
-        }
+        constants_used = (*iter)->set_constants(model_constants, array_size(model_constants));
+        set_shader_const(SHADER_REG_MODEL_DATA, *model_constants, constants_used);
         set_shader_matrix( SHADER_REG_POS_AND_ROT_MX, (*iter)->get_rotation_and_position() );
         
         // Draw

@@ -39,7 +39,8 @@ public:
             D3DXVECTOR3 rotation);
     
     VertexShader &get_shader();
-    virtual void set_time(float time) { UNREFERENCED_PARAMETER(time); }
+    virtual void set_time(float time) = 0;
+    virtual unsigned set_constants(D3DXVECTOR4 *out_data, unsigned buffer_size) const = 0; // returns number of constants used
     const D3DXMATRIX &get_rotation_and_position() const;
     virtual void draw() const;
 
@@ -68,9 +69,9 @@ public:
                     D3DXVECTOR3 rotation,
                     D3DXVECTOR3 bone_center);
 
-    const D3DXMATRIX &get_bone(unsigned number) const;
     // Overrides:
     virtual void set_time(float time);
+    virtual unsigned set_constants(D3DXVECTOR4 *out_data, unsigned buffer_size) const; // returns number of constants used
 };
 
 class MorphingModel : public Model
@@ -91,8 +92,7 @@ public:
                     D3DXVECTOR3 rotation,
                     float final_radius);
 
-    float get_mophing_param() const;
-    float get_final_radius() const;
     // Overrides:
     virtual void set_time(float time);
+    virtual unsigned set_constants(D3DXVECTOR4 *out_data, unsigned buffer_size) const; // returns number of constants used
 };

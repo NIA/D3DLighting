@@ -5,7 +5,8 @@ dcl_normal v3
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c0 - c3 is view matrix           ;;
-;; c27 - c30 is pos.*rot. matrix    ;;
+;; c4  is FINAL_RADIUS              ;;
+;; c5  is t                         ;;
 ;; c12 is directional light vector  ;;
 ;; c13 is directional light color   ;;
 ;; c14 is diffuse coefficient       ;;
@@ -22,8 +23,6 @@ dcl_normal v3
 ;; c25 is 1/(IN - OUT)              ;;
 ;; c26 is OUT/(IN - OUT)            ;;
 ;; c27 - c30 is pos.*rot. matrix    ;;
-;; c31 is FINAL_RADIUS              ;;
-;; c32 is t                         ;;
 ;;                                  ;;
 ;; c100 is constant 0.0f            ;;
 ;; c111 is constant 1.0f            ;;
@@ -68,8 +67,8 @@ dp3 r0, v0, v0
 rsq r0, r0              ; r0 = 1/|r|
 
 mov r2, c111            ; r2 = 1.0f
-mad r1, r0, c31, -r2    ; r1 = ((FINAL_RADIUS/r0) - 1)
-mad r1, r1, c32, r2     ; r1 = 1+t*((FINAL_RADIUS/r0) - 1)
+mad r1, r0, c4, -r2    ; r1 = ((FINAL_RADIUS/r0) - 1)
+mad r1, r1, c5, r2     ; r1 = 1+t*((FINAL_RADIUS/r0) - 1)
 
 mul r2.xyz, v0.xyz, r1.x
 
@@ -78,7 +77,7 @@ m4x4 r1, r2, c27        ; position and rotation
 mul r3, v0, r0.x         ; r3 is normalized position and is final normal
 mov r3.w, c100.w         ; ... and make it a vector, not a point
 add r4, r3, -v3         ; r4 = (r/|r| - n)
-mad r4, r4, c32.x, v3   ; r4 = n + (r/|r| - n)*t
+mad r4, r4, c5.x, v3   ; r4 = n + (r/|r| - n)*t
 dp3 r0, r4, r4          ; r0 = |r4|**2
 rsq r7, r0              ; r7 = 1/|r4|
 mul r4, r4, r7.x        ; normalized r4

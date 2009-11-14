@@ -126,7 +126,6 @@ INT WINAPI wWinMain( HINSTANCE, HINSTANCE, LPWSTR, INT )
                                D3DXVECTOR3(0,0,0),
                                0.7071f);
 
-
         app.add_model(cylinder1);
         app.add_model(cylinder2);
         app.add_model(pyramid);

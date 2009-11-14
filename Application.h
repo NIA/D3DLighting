@@ -12,6 +12,8 @@
 #pragma warning( default : 4995 ) // disable deprecated warning 
 
 extern const unsigned VECTORS_IN_MATRIX;
+typedef std::list<Model*> Models;
+
 class Application
 {
 private:
@@ -25,7 +27,7 @@ private:
 
     Window window;
 
-    std::list<Model*> models;
+    Models models;
 
     Camera camera;
 
