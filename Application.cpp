@@ -9,6 +9,7 @@ namespace
     const D3DCOLOR    BACKGROUND_COLOR = D3DCOLOR_XRGB( 5, 5, 10 );
     const bool        INITIAL_WIREFRAME_STATE = false;
     const D3DCOLOR    BLACK = D3DCOLOR_XRGB( 0, 0, 0 );
+    const float       ROTATE_STEP = D3DX_PI/30.0f;
 
     //---------------- SHADER CONSTANTS ---------------------------
     //    c0-c3 is the view matrix
@@ -185,6 +186,14 @@ void Application::remove_model(Model &model)
     models.remove( &model );
 }
 
+void Application::rotate_models(float phi)
+{
+    for ( Models::iterator iter = models.begin(); iter != models.end(); ++iter )
+    {
+        (*iter)->rotate(phi);
+    }
+}
+
 void Application::process_key(unsigned code)
 {
     switch( code )
@@ -193,11 +202,9 @@ void Application::process_key(unsigned code)
         PostQuitMessage( 0 );
         break;
     case VK_UP:
-    case 'W':
         camera.move_up();
         break;
     case VK_DOWN:
-    case 'S':
         camera.move_down();
         break;
     case VK_PRIOR:
@@ -211,12 +218,16 @@ void Application::process_key(unsigned code)
         camera.move_farther();
         break;
     case VK_LEFT:
-    case 'A':
         camera.move_clockwise();
         break;
     case VK_RIGHT:
-    case 'D':
         camera.move_counterclockwise();
+        break;
+    case 'A':
+        rotate_models(-ROTATE_STEP);
+        break;
+    case 'D':
+        rotate_models(ROTATE_STEP);
         break;
     case '1':
         directional_light_enabled = !directional_light_enabled;

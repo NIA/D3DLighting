@@ -60,6 +60,7 @@ private:
         set_shader_const(reg, D3DXCOLOR(color), 1);
     }
 
+    void rotate_models(float phi);
     void process_key(unsigned code);
 
     void render();

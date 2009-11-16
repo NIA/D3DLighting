@@ -41,7 +41,10 @@ public:
     VertexShader &get_shader();
     virtual void set_time(float time) = 0;
     virtual unsigned set_constants(D3DXVECTOR4 *out_data, unsigned buffer_size) const = 0; // returns number of constants used
+    
     const D3DXMATRIX &get_rotation_and_position() const;
+    void rotate(float phi);
+    
     virtual void draw() const;
 
     virtual ~Model();

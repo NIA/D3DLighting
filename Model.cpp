@@ -78,6 +78,12 @@ void Model::update_matrix()
     rotation_and_position = rotate_and_shift_matrix(rotation, position);
 }
 
+void Model::rotate(float phi)
+{
+    rotation.z += phi;
+    update_matrix();
+}
+
 const D3DXMATRIX &Model::get_rotation_and_position() const
 {
     return rotation_and_position;

@@ -41,5 +41,5 @@ inline D3DXMATRIX rotate_x_matrix(float angle, D3DXVECTOR3 center)
 
 inline D3DXMATRIX rotate_and_shift_matrix(D3DXVECTOR3 angles, D3DXVECTOR3 shift)
 {
-    return shift_matrix(shift)*rotate_x_matrix(angles.z)*rotate_y_matrix(angles.y)*rotate_x_matrix(angles.x);
+    return shift_matrix(shift)*rotate_z_matrix(angles.z)*rotate_y_matrix(angles.y)*rotate_x_matrix(angles.x);
 }
